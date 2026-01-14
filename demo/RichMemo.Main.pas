@@ -6,7 +6,7 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Memo.Types,
   FMX.Controls.Presentation, FMX.ScrollBox, FMX.Memo, FMX.RichEdit.Style,
-  FMX.TabControl, FMX.Objects, FMX.Filter.Effects;
+  FMX.TabControl, FMX.Objects, FMX.Filter.Effects, FMX.StdCtrls;
 
 type
   TFormMain = class(TForm)
@@ -24,6 +24,8 @@ type
     MemoPython: TMemo;
     TabItemHTML: TTabItem;
     MemoHTML: TMemo;
+    TabItemCSS: TTabItem;
+    MemoCSS: TMemo;
     procedure MemoPascalPresentationNameChoosing(Sender: TObject; var PresenterName: string);
     procedure FormCreate(Sender: TObject);
   private
@@ -56,6 +58,7 @@ begin
   MemoMD.ScrollAnimation := TBehaviorBoolean.True;
   MemoPython.ScrollAnimation := TBehaviorBoolean.True;
   MemoHTML.ScrollAnimation := TBehaviorBoolean.True;
+  MemoCSS.ScrollAnimation := TBehaviorBoolean.True;
 
   // Setting the default syntax and fonts
   if MemoPascal.Presentation is TRichEditStyled then
@@ -75,6 +78,9 @@ begin
 
   if MemoHTML.Presentation is TRichEditStyled then
     TRichEditStyled(MemoHTML.Presentation).SetCodeSyntaxName('html', MemoHTML.Font, MemoHTML.FontColor);
+
+  if MemoCSS.Presentation is TRichEditStyled then
+    TRichEditStyled(MemoCSS.Presentation).SetCodeSyntaxName('css', MemoCSS.Font, MemoCSS.FontColor);
 end;
 
 end.

@@ -6,7 +6,7 @@ uses
   FMX.Text.TextEditor, FMX.Text.LinesLayout, FMX.TextLayout, FMX.Memo.Style.New,
   FMX.Controls.Presentation, FMX.Text, FMX.ScrollBox.Style, FMX.Controls,
   FMX.Graphics, System.UITypes, Syntax.Code, FMX.Presentation.Messages,
-  System.Classes, System.Types, FMX.Types, FMX.Memo;
+  System.Classes, System.Types, FMX.Types, FMX.Memo, System.Generics.Collections;
 
 type
   TRichEditLinesLayout = class(TLinesLayout)
@@ -43,10 +43,22 @@ type
     FDragShift: TShiftState;
     FDragX, FDragY: Single;
     FCancelDrag, FNeedDefClick, FDragging: Boolean;
-    // FLinesBackgroundColor := TDictionary<Integer, TAlphaColor>.Create;
+    FLinesBackgroundColor: TDictionary<Integer, TAlphaColor>;
     FOnChangeCaretPos: TCaretPositionChanged;
+    FGutterWidth: Single;
+    FShowError: Boolean;
+    FErrorLine: Int64;
     procedure DoChangeCaretPos(Sender: TObject; const ACaretPosition: TCaretPosition);
     procedure SetOnChangeCaretPos(const Value: TCaretPositionChanged);
+    function GetCanCopy: Boolean;
+    function GetCanCut: Boolean;
+    function GetCanDelete: Boolean;
+    function GetCanPaste: Boolean;
+    function GetCanSelectAll: Boolean;
+    function GetCanUndo: Boolean;
+    function GetCanRedo: Boolean;
+    procedure DrawGutter;
+    procedure InternalContentPaint(Sender: TObject; ACanvas: TCanvas; const ARect: TRectF);
   protected
     function CreateEditor: TTextEditor; override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
@@ -57,18 +69,31 @@ type
     procedure PMSetStyleLookup(var AMessage: TDispatchMessageWithValue<string>); message PM_SET_STYLE_LOOKUP;
     procedure MMLinesChanged(var Message: TDispatchMessage); message MM_MEMO_LINES_CHANGED;
     procedure PMInit(var Message: TDispatchMessage); message PM_INIT;
+    procedure PaintChildren; override;
   public
+    procedure Paint; override;
+    procedure ApplyStyle; override;
     function GetSelectionRectTest: TRectF;
     procedure UpdateVisibleLayoutParams;
     procedure SetCodeSyntaxName(const Lang: string; const DefFont: TFont; DefColor: TAlphaColor);
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    property LinesBackgroundColor: TDictionary<Integer, TAlphaColor> read FLinesBackgroundColor;
     property OnChangeCaretPos: TCaretPositionChanged read FOnChangeCaretPos write SetOnChangeCaretPos;
+    property CanUndo: Boolean read GetCanUndo;
+    property CanRedo: Boolean read GetCanRedo;
+    property CanCut: Boolean read GetCanCut;
+    property CanCopy: Boolean read GetCanCopy;
+    property CanPaste: Boolean read GetCanPaste;
+    property CanDelete: Boolean read GetCanDelete;
+    property CanSelectAll: Boolean read GetCanSelectAll;
   end;
 
 implementation
 
 uses
   System.SysUtils, FMX.Presentation.Style, FMX.Presentation.Factory,
-  FMX.Platform, FMX.Forms;
+  FMX.Platform, FMX.Forms, FMX.Clipboard, System.Math;
 
 { TRichEditTextEditor }
 
@@ -159,10 +184,102 @@ end;
 
 { TRichEditStyled }
 
+procedure TRichEditStyled.DrawGutter;
+begin
+  FShowError := False;
+  LinesBackgroundColor.Clear;
+  Canvas.Font.Assign(Memo.TextSettings.Font);
+  var W := Ceil(Memo.Canvas.TextWidth(Memo.Lines.Count.ToString) + 20);
+  StylesData['Padding.Left'] := W;
+  if FGutterWidth <> W then
+  begin
+    FGutterWidth := W;
+    RealignContent;
+  end;
+  // Line number
+  var BRect := BoundsRect;
+
+  for var i := Max(0, Editor.LinesLayout.FirstVisibleLineIndex) to Min(Editor.LinesLayout.LastVisibleLineIndex, Editor.LinesLayout.Count - 1) do
+    if not Editor.LinesLayout[i].IsInvalidPosition then
+    begin
+      var Rect := Editor.LinesLayout[i].Rect;
+      Rect.Height := Editor.LinesLayout[i].Size.Height;
+      Rect.Offset(0, -ViewportPosition.Y + 6);
+      Rect.Left := 0;
+      Rect.Width := FGutterWidth - 10;
+      if Rect.Top < BRect.Height then
+        Rect.Bottom := Min(Rect.Bottom, ContentLayout.Height);
+      Rect.NormalizeRect;
+      if (Rect.Top < 0) and (Rect.Bottom < 0) then
+        Continue;
+      if (Rect.Top > BRect.Height) and (Rect.Bottom > BRect.Height) then
+        Continue;
+      Canvas.Fill.Color := TAlphaColorRec.White;
+      Canvas.Font.Assign(Self.Memo.TextSettings.Font);
+      var HDelta: Single := (100 / Editor.LinesLayout.Items[i].Rect.Height * Rect.Height) / 100;
+      if (FShowError) and (i = FErrorLine - 1) then
+      begin
+        Canvas.Fill.Color := TAlphaColorRec.Red;
+        var R := Rect;
+        R.Width := R.Width + 10;
+        R.Offset(-1, 0);
+        Canvas.FillRect(R, 0.1);
+        HDelta := 300;
+      end
+      else if i = Memo.CaretPosition.Line then
+      begin
+        var R := Rect;
+        R.Width := R.Width + 10;
+        R.Offset(-1, 0);
+        Canvas.FillRect(R, 0.1);
+        HDelta := 300;
+      end;   //  Trunc(Rect.Height).ToString
+      Canvas.FillText(Rect, (i + 1).ToString, False, 0.3 * HDelta, [], TTextAlign.Trailing, TTextAlign.Leading);
+    end;
+  Canvas.Stroke.Kind := TBrushKind.Solid;
+  Canvas.Stroke.Color := TAlphaColorRec.White;
+  Canvas.Stroke.Thickness := 1;
+  Canvas.DrawLine(Canvas.AlignToPixel(TPointF.Create(FGutterWidth, BRect.Top)), Canvas.AlignToPixel(TPointF.Create(FGutterWidth, BRect.Bottom)), 0.3);
+end;
+
+procedure TRichEditStyled.Paint;
+begin
+  DrawGutter;
+  inherited;
+end;
+
+procedure TRichEditStyled.PaintChildren;
+begin
+  inherited;
+  DrawGutter;
+end;
+
+procedure TRichEditStyled.ApplyStyle;
+begin
+  inherited;
+end;
+
+procedure TRichEditStyled.InternalContentPaint(Sender: TObject; ACanvas: TCanvas; const ARect: TRectF);
+begin
+  ContentPaint(Sender, ACanvas, ARect);
+end;
+
+constructor TRichEditStyled.Create(AOwner: TComponent);
+begin
+  inherited;
+  FLinesBackgroundColor := TDictionary<Integer, TAlphaColor>.Create;
+end;
+
 function TRichEditStyled.CreateEditor: TTextEditor;
 begin
   Result := TRichEditTextEditor.Create(Self, Memo.Content, Model, Self);
   TRichEditTextEditor(Result).OnChangeCaretPos := DoChangeCaretPos;
+end;
+
+destructor TRichEditStyled.Destroy;
+begin
+  FLinesBackgroundColor.Free;
+  inherited;
 end;
 
 procedure TRichEditStyled.DoChangeCaretPos(Sender: TObject; const ACaretPosition: TCaretPosition);
@@ -190,6 +307,44 @@ begin
   if FDragging and (Point <> TPointF.Create(FDragX, FDragY)) then
     FNeedDefClick := False;
   inherited;
+end;
+
+function TRichEditStyled.GetCanCopy: Boolean;
+begin
+  Result := Editor.SelectionController.IsSelected;
+end;
+
+function TRichEditStyled.GetCanCut: Boolean;
+begin
+  Result := Editor.SelectionController.IsSelected and not Model.ReadOnly;
+end;
+
+function TRichEditStyled.GetCanDelete: Boolean;
+begin
+  Result := Editor.SelectionController.IsSelected and not Model.ReadOnly;
+end;
+
+function TRichEditStyled.GetCanPaste: Boolean;
+var
+  ClipService: IFMXExtendedClipboardService;
+begin
+  Result := TPlatformServices.Current.SupportsPlatformService(IFMXExtendedClipboardService, ClipService) and
+    ClipService.HasText and not Model.ReadOnly;
+end;
+
+function TRichEditStyled.GetCanRedo: Boolean;
+begin
+  Result := not Model.ReadOnly and UndoManager.CanRedo;
+end;
+
+function TRichEditStyled.GetCanSelectAll: Boolean;
+begin
+  Result := Model.SelLength <> Model.Lines.Text.Length;
+end;
+
+function TRichEditStyled.GetCanUndo: Boolean;
+begin
+  Result := not Model.ReadOnly and UndoManager.CanUndo;
 end;
 
 function TRichEditStyled.GetSelectionRectTest: TRectF;
@@ -236,7 +391,7 @@ begin
     end;
   end
   else     }
-    inherited;
+  inherited;
 end;
 
 procedure TRichEditStyled.MouseMove(Shift: TShiftState; X, Y: Single);
@@ -254,6 +409,7 @@ begin
   inherited;
   FWasInitialized := True;
   StyleLookup := Memo.StyleLookup;
+  Content.OnPaint := InternalContentPaint;
 end;
 
 procedure TRichEditStyled.PMSetStyleLookup(var AMessage: TDispatchMessageWithValue<string>);
@@ -269,14 +425,14 @@ end;
 
 procedure TRichEditStyled.SetOnChangeCaretPos(const Value: TCaretPositionChanged);
 begin
-
+  FOnChangeCaretPos := Value;
 end;
 
 procedure TRichEditStyled.UpdateVisibleLayoutParams;
 begin
   TRichEditLinesLayout(Editor.LinesLayout).ClearCache;
 
-  for var i := Editor.LinesLayout.FirstVisibleLineIndex to Editor.LinesLayout.LastVisibleLineIndex do
+  for var i := Max(0, Editor.LinesLayout.FirstVisibleLineIndex) to Min(Editor.LinesLayout.LastVisibleLineIndex, Editor.LinesLayout.Count - 1) do
   begin
     var Line := Editor.LinesLayout.Items[i];
     if Line.Layout <> nil then

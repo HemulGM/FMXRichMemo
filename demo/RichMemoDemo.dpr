@@ -13,7 +13,8 @@ uses
   Syntax.Code.JSON in '..\Syntax.Code.JSON.pas',
   Syntax.Code.HTML in '..\Syntax.Code.HTML.pas',
   SpellChecker in '..\SpellChecker.pas',
-  Syntax.Code.CSS in '..\Syntax.Code.CSS.pas';
+  Syntax.Code.CSS in '..\Syntax.Code.CSS.pas',
+  FMX.StyledContextMenu in '..\FMX.StyledContextMenu.pas';
 
 {$R *.res}
 

@@ -34,10 +34,11 @@ begin
     'column', 'create', 'replace',
     'database', 'default', 'delete', 'desc', 'distinct', 'drop', 'exec',
     'exists', 'foreign', 'from', 'group', 'having',
-    'index', 'inner', 'insert', 'key',
-    'limit', 'order', 'outer',
+    'index', 'inner', 'insert', 'key', 'partition',
+    'limit', 'order', 'outer', 'with',
     'primary', 'procedure', 'right', 'join', 'rownum', 'select',
-    'into', 'set', 'table', 'top', 'truncate', 'union',
+    'into', 'set', 'table', 'top', 'truncate', 'union', 'over',
+    'case', 'when', 'else', 'then', 'end',
     'unique', 'update', 'values', 'view', 'where', 'on', 'full', 'left'];
   KeyWord.Color := $FF638FCF;
   KeyWord.Font.Assign(FDefaultFont);
@@ -45,9 +46,9 @@ begin
   FKeyWords.Add(KeyWord);
 
   KeyWord := TKeyWord.Create;
-  KeyWord.Word := ['ascii', 'char_length', 'character_length', 'concat', 'concat_ws',
-    'field', 'find_in_set', 'format', 'instr', 'lcase', 'length', 'locate',
-    'lower', 'lpad', 'ltrim', 'mid', 'position', 'repeat', 'reverse',
+  KeyWord.Word := ['ascii', 'char_length', 'character_length', 'concat', 'concat_ws', 'interval',
+    'field', 'find_in_set', 'format', 'instr', 'lcase', 'length', 'locate', 'row_number',
+    'lower', 'lpad', 'ltrim', 'mid', 'position', 'repeat', 'reverse', 'rank', 'round',
     'rpad', 'rtrim', 'space', 'strcmp', 'substr', 'substring', 'substring_index', 'trim',
     'ucase', 'upper', 'adddate', 'addtime', 'curdate', 'current_date', 'current_time',
     'current_timestamp', 'curtime', 'date', 'datediff', 'date_add', 'date_format',
@@ -56,7 +57,7 @@ begin
     'microsecond', 'minute', 'month', 'monthname', 'now', 'period_add', 'period_diff',
     'quarter', 'second', 'sec_to_time', 'str_to_date', 'subdate', 'subtime', 'sysdate',
     'time', 'time_format', 'time_to_sec', 'timediff', 'timestamp', 'to_days', 'week',
-    'weekday', 'weekofyear', 'year', 'yearweek', 'bin', 'binary', 'case', 'cast',
+    'weekday', 'weekofyear', 'year', 'yearweek', 'bin', 'binary', 'cast',
     'coalesce', 'connection_id', 'conv', 'convert', 'current_user',
     'if', 'ifnull', 'isnull', 'last_insert_id', 'nullif', 'session_user', 'system_user', 'user', 'version',
     'any_value', 'array_agg', 'array_concat_agg', 'avg', 'bit_and', 'bit_or', 'bit_xor', 'count',

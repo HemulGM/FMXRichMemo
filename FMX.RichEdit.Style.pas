@@ -5,13 +5,15 @@ interface
 uses
   FMX.Text.TextEditor, FMX.Text.LinesLayout, FMX.TextLayout, FMX.Memo.Style.New,
   FMX.Controls.Presentation, FMX.Text, FMX.ScrollBox.Style, FMX.Controls,
-  FMX.Graphics, System.UITypes, Syntax.Code, FMX.Presentation.Messages,
+  FMX.Graphics, System.UITypes, Syntax.Code, FMX.Presentation.Messages, FMX.Menus,
   System.Classes, System.Types, FMX.Types, FMX.Memo, System.Generics.Collections;
 
 type
   TRichEditLinesLayout = class(TLinesLayout)
   private
     FCodeSyntax: TCodeSyntax;
+    FLineSpacing: Single;
+    procedure SetLineSpacing(const Value: Single);
   protected
     procedure UpdateLayoutParams(const ALineIndex: Integer; const ALayout: TTextLayout); override;
     procedure InvalidateLinesLayouts;
@@ -23,6 +25,7 @@ type
   public
     procedure SetCodeSyntaxName(const Lang: string; const DefFont: TFont; DefColor: TAlphaColor);
     procedure ClearCache;
+    property LineSpacing: Single read FLineSpacing write SetLineSpacing;
   end;
 
   TRichEditTextEditor = class(TTextEditor)
@@ -48,6 +51,9 @@ type
     FGutterWidth: Single;
     FShowError: Boolean;
     FErrorLine: Int64;
+    FShowGutter: Boolean;
+    FShowCurrentLine: Boolean;
+    FLineSpacing: Single;
     procedure DoChangeCaretPos(Sender: TObject; const ACaretPosition: TCaretPosition);
     procedure SetOnChangeCaretPos(const Value: TCaretPositionChanged);
     function GetCanCopy: Boolean;
@@ -57,8 +63,13 @@ type
     function GetCanSelectAll: Boolean;
     function GetCanUndo: Boolean;
     function GetCanRedo: Boolean;
-    procedure DrawGutter;
+    procedure DrawGutter(ACanvas: TCanvas);
     procedure InternalContentPaint(Sender: TObject; ACanvas: TCanvas; const ARect: TRectF);
+    procedure SetShowGutter(const Value: Boolean);
+    procedure SetErrorLine(const Value: Int64);
+    procedure SetShowError(const Value: Boolean);
+    procedure SetShowCurrentLine(const Value: Boolean);
+    procedure SetLineSpacing(const Value: Single);
   protected
     function CreateEditor: TTextEditor; override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
@@ -70,6 +81,8 @@ type
     procedure MMLinesChanged(var Message: TDispatchMessage); message MM_MEMO_LINES_CHANGED;
     procedure PMInit(var Message: TDispatchMessage); message PM_INIT;
     procedure PaintChildren; override;
+    procedure DoViewportPositionChange(const OldViewportPosition, NewViewportPosition: TPointF; const ContentSizeChanged: Boolean); override;
+    procedure FillPopupMenu(const AMenu: TPopupMenu); override;
   public
     procedure Paint; override;
     procedure ApplyStyle; override;
@@ -87,13 +100,18 @@ type
     property CanPaste: Boolean read GetCanPaste;
     property CanDelete: Boolean read GetCanDelete;
     property CanSelectAll: Boolean read GetCanSelectAll;
+    property ShowGutter: Boolean read FShowGutter write SetShowGutter;
+    property ShowError: Boolean read FShowError write SetShowError;
+    property ErrorLine: Int64 read FErrorLine write SetErrorLine;
+    property ShowCurrentLine: Boolean read FShowCurrentLine write SetShowCurrentLine;
+    property LineSpacing: Single read FLineSpacing write SetLineSpacing;
   end;
 
 implementation
 
 uses
   System.SysUtils, FMX.Presentation.Style, FMX.Presentation.Factory,
-  FMX.Platform, FMX.Forms, FMX.Clipboard, System.Math;
+  FMX.Platform, FMX.Forms, FMX.Clipboard, System.Math, FMX.StyledContextMenu;
 
 { TRichEditTextEditor }
 
@@ -124,6 +142,7 @@ end;
 
 constructor TRichEditLinesLayout.Create(const ALineSource: ITextLinesSource; const AScrollableContent: IScrollableContent);
 begin
+  FLineSpacing := 1;
   inherited;
 end;
 
@@ -164,6 +183,11 @@ begin
   Realign;
 end;
 
+procedure TRichEditLinesLayout.SetLineSpacing(const Value: Single);
+begin
+  FLineSpacing := Value;
+end;
+
 procedure TRichEditLinesLayout.UpdateLayoutParams(const ALineIndex: Integer; const ALayout: TTextLayout);
 begin
   if not Assigned(FCodeSyntax) then
@@ -178,6 +202,9 @@ begin
       Attr.Attribute.Font.Family := TextSettings.Font.Family;
       ALayout.AddAttribute(Attr.Range, Attr.Attribute);
     end;
+    var P := (FLineSpacing - 1) * GetLineHeight(ALineIndex) / 2;
+    ALayout.Padding.Top := P;
+    ALayout.Padding.Bottom := P;
   finally
     ALayout.EndUpdate;
   end;
@@ -187,19 +214,30 @@ end;
 
 procedure TRichEditStyled.DrawGutter;
 begin
-  FShowError := False;
   LinesBackgroundColor.Clear;
-  Canvas.Font.Assign(Memo.TextSettings.Font);
-  var W := Ceil(Memo.Canvas.TextWidth(Memo.Lines.Count.ToString) + 20);
-  StylesData['Padding.Left'] := W;
-  if FGutterWidth <> W then
+  ACanvas.Font.Assign(Memo.TextSettings.Font);
+  if FShowGutter then
   begin
-    FGutterWidth := W;
-    RealignContent;
+    var W := Ceil(ACanvas.TextWidth(Memo.Lines.Count.ToString) + 20);
+    if FGutterWidth <> W then
+    begin
+      FGutterWidth := W;
+      StylesData['Padding.Left'] := W;
+      RealignContent;
+      //Exit;
+    end;
+  end
+  else
+  begin
+    if FGutterWidth <> 0 then
+    begin
+      FGutterWidth := 0;
+      StylesData['Padding.Left'] := 0;
+      RealignContent;
+    end;
   end;
   // Line number
   var BRect := BoundsRect;
-
   for var i := Max(0, Editor.LinesLayout.FirstVisibleLineIndex) to Min(Editor.LinesLayout.LastVisibleLineIndex, Editor.LinesLayout.Count - 1) do
     if not Editor.LinesLayout[i].IsInvalidPosition then
     begin
@@ -208,51 +246,60 @@ begin
       Rect.Offset(0, -ViewportPosition.Y + 6);
       Rect.Left := 0;
       Rect.Width := FGutterWidth - 10;
-      if Rect.Top < BRect.Height then
-        Rect.Bottom := Min(Rect.Bottom, ContentLayout.Height);
       Rect.NormalizeRect;
       if (Rect.Top < 0) and (Rect.Bottom < 0) then
         Continue;
       if (Rect.Top > BRect.Height) and (Rect.Bottom > BRect.Height) then
         Continue;
-      Canvas.Fill.Color := TAlphaColorRec.White;
-      Canvas.Font.Assign(Self.Memo.TextSettings.Font);
-      var HDelta: Single := (100 / Editor.LinesLayout.Items[i].Rect.Height * Rect.Height) / 100;
-      if (FShowError) and (i = FErrorLine - 1) then
+
+      ACanvas.Fill.Color := TAlphaColorRec.White;
+      var DeltaOpacity: Single := (100 / Editor.LinesLayout.Items[i].Rect.Height * Rect.Height) / 100;
+
+      if FShowError and (i = FErrorLine - 1) then
       begin
-        Canvas.Fill.Color := TAlphaColorRec.Red;
+        ACanvas.Fill.Color := TAlphaColorRec.Red;
         var R := Rect;
-        R.Width := R.Width + 10;
+        R.Width := Memo.Width;
         R.Offset(-1, 0);
-        Canvas.FillRect(R, 0.1);
-        HDelta := 300;
+        ACanvas.FillRect(R, 0.1);
+        DeltaOpacity := 300;
       end
-      else if i = Memo.CaretPosition.Line then
+      else if FShowCurrentLine and (i = Memo.CaretPosition.Line) then
       begin
         var R := Rect;
-        R.Width := R.Width + 10;
+        R.Width := Memo.Width;
         R.Offset(-1, 0);
-        Canvas.FillRect(R, 0.1);
-        HDelta := 300;
-      end;   //  Trunc(Rect.Height).ToString
-      Canvas.FillText(Rect, (i + 1).ToString, False, 0.3 * HDelta, [], TTextAlign.Trailing, TTextAlign.Leading);
+        ACanvas.FillRect(R, 0.1);
+        DeltaOpacity := 300;
+      end;
+
+      if FShowGutter then
+        ACanvas.FillText(Rect, (i + 1).ToString, False, 0.3 * DeltaOpacity, [], TTextAlign.Trailing, TTextAlign.Center);
     end;
-  Canvas.Stroke.Kind := TBrushKind.Solid;
-  Canvas.Stroke.Color := TAlphaColorRec.White;
-  Canvas.Stroke.Thickness := 1;
-  Canvas.DrawLine(Canvas.AlignToPixel(TPointF.Create(FGutterWidth, BRect.Top)), Canvas.AlignToPixel(TPointF.Create(FGutterWidth, BRect.Bottom)), 0.3);
+  if FShowGutter then
+  begin
+    ACanvas.Stroke.Kind := TBrushKind.Solid;
+    ACanvas.Stroke.Color := TAlphaColorRec.White;
+    ACanvas.Stroke.Thickness := 1;
+    ACanvas.DrawLine(ACanvas.AlignToPixel(TPointF.Create(FGutterWidth, BRect.Top)), ACanvas.AlignToPixel(TPointF.Create(FGutterWidth, BRect.Bottom)), 0.3);
+  end;
+end;
+
+procedure TRichEditStyled.FillPopupMenu(const AMenu: TPopupMenu);
+begin
+  inherited;
+  LocalizeDefPopupMenu(AMenu);
 end;
 
 procedure TRichEditStyled.Paint;
 begin
-  DrawGutter;
   inherited;
+  DrawGutter(Canvas);
 end;
 
 procedure TRichEditStyled.PaintChildren;
 begin
   inherited;
-  DrawGutter;
 end;
 
 procedure TRichEditStyled.ApplyStyle;
@@ -268,6 +315,7 @@ end;
 constructor TRichEditStyled.Create(AOwner: TComponent);
 begin
   inherited;
+  FLineSpacing := 1;
   FLinesBackgroundColor := TDictionary<Integer, TAlphaColor>.Create;
 end;
 
@@ -275,6 +323,7 @@ function TRichEditStyled.CreateEditor: TTextEditor;
 begin
   Result := TRichEditTextEditor.Create(Self, Memo.Content, Model, Self);
   TRichEditTextEditor(Result).OnChangeCaretPos := DoChangeCaretPos;
+
 end;
 
 destructor TRichEditStyled.Destroy;
@@ -287,6 +336,13 @@ procedure TRichEditStyled.DoChangeCaretPos(Sender: TObject; const ACaretPosition
 begin
   if Assigned(FOnChangeCaretPos) then
     FOnChangeCaretPos(Self, ACaretPosition);
+  Repaint;
+end;
+
+procedure TRichEditStyled.DoViewportPositionChange(const OldViewportPosition, NewViewportPosition: TPointF; const ContentSizeChanged: Boolean);
+begin
+  inherited;
+  Repaint;
 end;
 
 procedure TRichEditStyled.DragEnd;
@@ -424,20 +480,46 @@ begin
   TRichEditLinesLayout(Editor.LinesLayout).SetCodeSyntaxName(Lang, DefFont, DefColor);
 end;
 
+procedure TRichEditStyled.SetErrorLine(const Value: Int64);
+begin
+  FErrorLine := Value;
+  Repaint;
+end;
+
+procedure TRichEditStyled.SetLineSpacing(const Value: Single);
+begin
+  FLineSpacing := Value;
+  TRichEditLinesLayout(Editor.LinesLayout).LineSpacing := FLineSpacing;
+  TRichEditLinesLayout(Editor.LinesLayout).InvalidateLinesLayouts;
+  TRichEditLinesLayout(Editor.LinesLayout).Realign;
+end;
+
 procedure TRichEditStyled.SetOnChangeCaretPos(const Value: TCaretPositionChanged);
 begin
   FOnChangeCaretPos := Value;
 end;
 
+procedure TRichEditStyled.SetShowCurrentLine(const Value: Boolean);
+begin
+  FShowCurrentLine := Value;
+  Repaint;
+end;
+
+procedure TRichEditStyled.SetShowError(const Value: Boolean);
+begin
+  FShowError := Value;
+  Repaint;
+end;
+
+procedure TRichEditStyled.SetShowGutter(const Value: Boolean);
+begin
+  FShowGutter := Value;
+  RecalcSize;
+end;
+
 procedure TRichEditStyled.UpdateVisibleLayoutParams;
 begin
   TRichEditLinesLayout(Editor.LinesLayout).ClearCache;
-  var First := Editor.LinesLayout.FirstVisibleLineIndex;
-  var Last := Editor.LinesLayout.LastVisibleLineIndex;
-  if (First < 0) or (Last < 0) or (First > Last) then
-    Exit;
-  if Last >= Editor.LinesLayout.Count then
-    Last := Editor.LinesLayout.Count - 1;
 
   for var i := Max(0, Editor.LinesLayout.FirstVisibleLineIndex) to Min(Editor.LinesLayout.LastVisibleLineIndex, Editor.LinesLayout.Count - 1) do
   begin

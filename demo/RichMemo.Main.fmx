@@ -18,7 +18,7 @@ object FormMain: TFormMain
     Margins.Top = 10.000000000000000000
     Margins.Right = 10.000000000000000000
     Margins.Bottom = 10.000000000000000000
-    Size.Width = 955.000000000000000000
+    Size.Width = 740.000000000000000000
     Size.Height = 659.000000000000000000
     Size.PlatformDefault = False
     TabHeight = 48.000000000000000000
@@ -26,19 +26,19 @@ object FormMain: TFormMain
     TabOrder = 0
     TabPosition = PlatformDefault
     Sizes = (
-      955s
+      740s
       611s
-      955s
+      740s
       611s
-      955s
+      740s
       611s
-      955s
+      740s
       611s
-      955s
+      740s
       611s
-      955s
+      740s
       611s
-      955s
+      740s
       611s)
     object TabItemPascal: TTabItem
       CustomIcon = <
@@ -243,13 +243,13 @@ object FormMain: TFormMain
         TextSettings.Font.Family = 'Consolas'
         TextSettings.Font.Size = 14.000000000000000000
         Align = Client
-        Size.Width = 955.000000000000000000
+        Size.Width = 740.000000000000000000
         Size.Height = 611.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 925.000000000000000000
+        Viewport.Width = 710.000000000000000000
         Viewport.Height = 587.000000000000000000
       end
     end
@@ -459,13 +459,13 @@ object FormMain: TFormMain
         TextSettings.Font.Family = 'Consolas'
         TextSettings.Font.Size = 14.000000000000000000
         Align = Client
-        Size.Width = 955.000000000000000000
+        Size.Width = 740.000000000000000000
         Size.Height = 611.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 925.000000000000000000
+        Viewport.Width = 710.000000000000000000
         Viewport.Height = 587.000000000000000000
       end
     end
@@ -530,13 +530,13 @@ object FormMain: TFormMain
         TextSettings.Font.Family = 'Consolas'
         TextSettings.Font.Size = 14.000000000000000000
         Align = Client
-        Size.Width = 955.000000000000000000
+        Size.Width = 740.000000000000000000
         Size.Height = 611.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 925.000000000000000000
+        Viewport.Width = 710.000000000000000000
         Viewport.Height = 599.000000000000000000
       end
     end
@@ -589,13 +589,13 @@ object FormMain: TFormMain
         TextSettings.Font.Family = 'Consolas'
         TextSettings.Font.Size = 14.000000000000000000
         Align = Client
-        Size.Width = 955.000000000000000000
+        Size.Width = 740.000000000000000000
         Size.Height = 611.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 937.000000000000000000
+        Viewport.Width = 722.000000000000000000
         Viewport.Height = 599.000000000000000000
       end
     end
@@ -905,13 +905,13 @@ object FormMain: TFormMain
         TextSettings.Font.Family = 'Consolas'
         TextSettings.Font.Size = 14.000000000000000000
         Align = Client
-        Size.Width = 955.000000000000000000
+        Size.Width = 740.000000000000000000
         Size.Height = 611.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 925.000000000000000000
+        Viewport.Width = 710.000000000000000000
         Viewport.Height = 587.000000000000000000
       end
     end
@@ -1082,14 +1082,14 @@ object FormMain: TFormMain
         TextSettings.Font.Family = 'Consolas'
         TextSettings.Font.Size = 14.000000000000000000
         Align = Client
-        Size.Width = 955.000000000000000000
+        Size.Width = 740.000000000000000000
         Size.Height = 611.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 925.000000000000000000
-        Viewport.Height = 599.000000000000000000
+        Viewport.Width = 710.000000000000000000
+        Viewport.Height = 587.000000000000000000
       end
     end
     object TabItemCSS: TTabItem
@@ -1261,13 +1261,13 @@ object FormMain: TFormMain
         TextSettings.Font.Family = 'Consolas'
         TextSettings.Font.Size = 14.000000000000000000
         Align = Client
-        Size.Width = 955.000000000000000000
+        Size.Width = 740.000000000000000000
         Size.Height = 611.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 925.000000000000000000
+        Viewport.Width = 710.000000000000000000
         Viewport.Height = 599.000000000000000000
       end
     end
@@ -38627,5 +38627,97 @@ object FormMain: TFormMain
       end>
     Left = 740
     Top = 112
+  end
+  object Layout1: TLayout
+    Align = Left
+    Padding.Left = 10.000000000000000000
+    Padding.Top = 10.000000000000000000
+    Padding.Right = 10.000000000000000000
+    Padding.Bottom = 10.000000000000000000
+    Size.Width = 215.000000000000000000
+    Size.Height = 679.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+    object CheckBoxGutter: TCheckBox
+      Align = Top
+      Margins.Bottom = 10.000000000000000000
+      Position.X = 10.000000000000000000
+      Position.Y = 62.000000000000000000
+      Size.Width = 195.000000000000000000
+      Size.Height = 32.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'checkboxstyle_switch_lefttext'
+      TabOrder = 2
+      Text = 'Gutter'
+      OnChange = CheckBoxGutterChange
+    end
+    object Label1: TLabel
+      Align = Top
+      Margins.Bottom = 35.000000000000000000
+      Position.X = 10.000000000000000000
+      Position.Y = 10.000000000000000000
+      Size.Width = 195.000000000000000000
+      Size.Height = 17.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'labelstyle_subtitle'
+      Text = 'RichMemo Demo'
+      TabOrder = 3
+    end
+    object CheckBoxCurrentLine: TCheckBox
+      Align = Top
+      Margins.Bottom = 10.000000000000000000
+      Position.X = 10.000000000000000000
+      Position.Y = 104.000000000000000000
+      Size.Width = 195.000000000000000000
+      Size.Height = 32.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'checkboxstyle_switch_lefttext'
+      TabOrder = 1
+      Text = 'Current line'
+      OnChange = CheckBoxCurrentLineChange
+    end
+    object CheckBoxErrorLine: TCheckBox
+      Align = Top
+      Margins.Bottom = 10.000000000000000000
+      Position.X = 10.000000000000000000
+      Position.Y = 146.000000000000000000
+      Size.Width = 195.000000000000000000
+      Size.Height = 32.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'checkboxstyle_switch_lefttext'
+      TabOrder = 0
+      Text = 'Error line'
+      OnChange = CheckBoxErrorLineChange
+    end
+    object SpinBoxLineSpacing: TSpinBox
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      Align = Top
+      TabOrder = 4
+      Cursor = crIBeam
+      Min = 1.000000000000000000
+      Max = 10.000000000000000000
+      Value = 1.000000000000000000
+      ValueType = Float
+      Increment = 0.100000001490116100
+      KeyboardType = NumbersAndPunctuation
+      Position.X = 100.000000000000000000
+      Position.Y = 188.000000000000000000
+      Margins.Left = 90.000000000000000000
+      Size.Width = 105.000000000000000000
+      Size.Height = 32.000000000000000000
+      Size.PlatformDefault = False
+      OnChange = SpinBoxLineSpacingChange
+      OnChangeTracking = SpinBoxLineSpacingChange
+      object Label2: TLabel
+        Align = Left
+        Margins.Left = -90.000000000000000000
+        Position.X = -90.000000000000000000
+        Size.Width = 120.000000000000000000
+        Size.Height = 32.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Line spacing'
+        TabOrder = 0
+      end
+    end
   end
 end

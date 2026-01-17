@@ -11,7 +11,9 @@ uses
   Syntax.Code.Python in '..\Syntax.Code.Python.pas',
   Syntax.Code.SQL in '..\Syntax.Code.SQL.pas',
   Syntax.Code.JSON in '..\Syntax.Code.JSON.pas',
-  SpellChecker in '..\SpellChecker.pas';
+  Syntax.Code.HTML in '..\Syntax.Code.HTML.pas',
+  SpellChecker in '..\SpellChecker.pas',
+  Syntax.Code.CSS in '..\Syntax.Code.CSS.pas';
 
 {$R *.res}
 

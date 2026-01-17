@@ -43,7 +43,16 @@ begin
 end;
 
 initialization
+begin
+  {$IF CompilerVersion >= 37.0}
+    // Delphi 13 and newer already register IFMXSpellCheckerService
+    // Remove existing before adding your own
+    if TPlatformServices.Current.SupportsPlatformService(IFMXSpellCheckerService) then
+      TPlatformServices.Current.RemovePlatformService(IFMXSpellCheckerService);
+  {$ENDIF}
+
   TPlatformServices.Current.AddPlatformService(IFMXSpellCheckerService, TWinSpellCheckerService.Create);
+end;
 
 end.
 

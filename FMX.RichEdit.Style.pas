@@ -146,7 +146,8 @@ procedure TRichEditLinesLayout.ReplaceLine(const AIndex: Integer; const ALine: s
 begin
   inherited;
   // We have to reapply style attributes after line modification
-  Items[AIndex].InvalidateLayout;
+  if (AIndex >= 0) and (AIndex < Count) then // Guard against invalid indices (e.g. when lines are cleared)
+    Items[AIndex].InvalidateLayout;
 end;
 
 procedure TRichEditLinesLayout.SetCodeSyntaxName(const Lang: string; const DefFont: TFont; DefColor: TAlphaColor);
@@ -431,6 +432,12 @@ end;
 procedure TRichEditStyled.UpdateVisibleLayoutParams;
 begin
   TRichEditLinesLayout(Editor.LinesLayout).ClearCache;
+  var First := Editor.LinesLayout.FirstVisibleLineIndex;
+  var Last := Editor.LinesLayout.LastVisibleLineIndex;
+  if (First < 0) or (Last < 0) or (First > Last) then
+    Exit;
+  if Last >= Editor.LinesLayout.Count then
+    Last := Editor.LinesLayout.Count - 1;
 
   for var i := Max(0, Editor.LinesLayout.FirstVisibleLineIndex) to Min(Editor.LinesLayout.LastVisibleLineIndex, Editor.LinesLayout.Count - 1) do
   begin

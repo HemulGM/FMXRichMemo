@@ -35,12 +35,15 @@ object FormMain: TFormMain
       955s
       611s
       955s
+      611s
+      955s
+      611s
+      955s
       611s)
     object TabItemPascal: TTabItem
       CustomIcon = <
         item
         end>
-      TextSettings.Trimming = None
       IsSelected = True
       Size.Width = 59.000000000000000000
       Size.Height = 48.000000000000000000
@@ -254,7 +257,6 @@ object FormMain: TFormMain
       CustomIcon = <
         item
         end>
-      TextSettings.Trimming = None
       IsSelected = False
       Size.Width = 55.000000000000000000
       Size.Height = 48.000000000000000000
@@ -471,7 +473,6 @@ object FormMain: TFormMain
       CustomIcon = <
         item
         end>
-      TextSettings.Trimming = None
       IsSelected = False
       Size.Width = 46.000000000000000000
       Size.Height = 48.000000000000000000
@@ -485,11 +486,46 @@ object FormMain: TFormMain
         Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
         DataDetectorTypes = []
         Lines.Strings = (
+          'WITH dept_stats AS ('
+          '  SELECT'
+          '    e.department_id,'
+          '    d.name AS department,'
+          '    COUNT(*) AS total_employees,'
+          '    AVG(e.salary) AS avg_salary,'
+          '    SUM(CASE WHEN e.active THEN 1 ELSE 0 END) AS active_count'
+          '  FROM employees e'
+          '  JOIN departments d ON d.id = e.department_id'
+          '  WHERE e.hire_date >= CURRENT_DATE - INTERVAL '#39'5 year'#39
+          '    AND e.status <> '#39'terminated'#39
+          '  GROUP BY e.department_id, d.name'
+          '  HAVING COUNT(*) > 5'
+          '),'
+          'ranked_emps AS ('
+          '  SELECT'
+          '    e.id,'
+          '    e.name,'
+          '    e.department_id,'
+          '    e.salary,'
+          
+            '    ROW_NUMBER() OVER (PARTITION BY e.department_id ORDER BY e.s' +
+            'alary DESC) AS dept_rank,'
+          '    RANK() OVER (ORDER BY e.salary DESC) AS global_rank'
+          '  FROM employees e'
+          '  WHERE e.status = '#39'active'#39
+          ')'
           'SELECT'
-          '  department,'
-          '  COUNT(*) AS employees_by_department'
-          'FROM employees'
-          'GROUP BY department;')
+          '  ds.department,'
+          '  ds.total_employees,'
+          '  ROUND(ds.avg_salary, 2) AS avg_salary,'
+          '  ds.active_count,'
+          '  re.name AS top_earner,'
+          '  re.salary AS top_salary,'
+          '  re.dept_rank'
+          'FROM dept_stats ds'
+          'LEFT JOIN ranked_emps re'
+          '  ON re.department_id = ds.department_id AND re.dept_rank = 1'
+          'ORDER BY ds.total_employees DESC, ds.avg_salary DESC'
+          'LIMIT 20;')
         StyledSettings = [Style, FontColor]
         TextSettings.Font.Family = 'Consolas'
         TextSettings.Font.Size = 14.000000000000000000
@@ -500,7 +536,7 @@ object FormMain: TFormMain
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 937.000000000000000000
+        Viewport.Width = 925.000000000000000000
         Viewport.Height = 599.000000000000000000
       end
     end
@@ -508,7 +544,6 @@ object FormMain: TFormMain
       CustomIcon = <
         item
         end>
-      TextSettings.Trimming = None
       IsSelected = False
       Size.Width = 65.000000000000000000
       Size.Height = 48.000000000000000000
@@ -568,7 +603,6 @@ object FormMain: TFormMain
       CustomIcon = <
         item
         end>
-      TextSettings.Trimming = None
       IsSelected = False
       Size.Width = 168.000000000000000000
       Size.Height = 48.000000000000000000
@@ -879,6 +913,362 @@ object FormMain: TFormMain
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
         Viewport.Width = 925.000000000000000000
         Viewport.Height = 587.000000000000000000
+      end
+    end
+    object TabItemHTML: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = False
+      Size.Width = 58.000000000000000000
+      Size.Height = 48.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = ''
+      TabOrder = 0
+      Text = 'HTML'
+      ExplicitSize.cx = 58.000000000000000000
+      ExplicitSize.cy = 48.000000000000000000
+      object MemoHTML: TMemo
+        Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+        CheckSpelling = True
+        DataDetectorTypes = []
+        Lines.Strings = (
+          '<!doctype html>'
+          '<html lang="en">'
+          '<head>'
+          '  <meta charset="utf-8">'
+          
+            '  <meta name="viewport" content="width=device-width, initial-sca' +
+            'le=1">'
+          '  <title>FMXRichMemo HTML Demo</title>'
+          '  <!-- Comment: tags, attrs, strings, entities -->'
+          '</head>'
+          
+            '<body class="app theme-dark" data-app="FMXRichMemo" aria-label="' +
+            'Demo page">'
+          '  <header id="top" class="header">'
+          '    <h1>HTML Syntax Highlighting Demo</h1>'
+          '    <p>'
+          
+            '      Entities: &amp; &lt; &gt; &quot; &apos; &nbsp; &copy; &reg' +
+            '; &mdash;'
+          '    </p>'
+          
+            '    <!-- A comment with <tags attr="value"> inside should still ' +
+            'be comment -->'
+          '  </header>'
+          ''
+          '  <nav class="nav" role="navigation" aria-label="Primary">'
+          '    <a href="#section-forms" class="link">Forms</a>'
+          '    <a href="#section-media" class="link">Media</a>'
+          '    <a href="#section-tables" class="link">Tables</a>'
+          '    <a href="#section-misc" class="link">Misc</a>'
+          '  </nav>'
+          ''
+          '  <main class="content">'
+          '    <section id="section-forms" class="card" data-kind='#39'demo'#39'>'
+          '      <h2>Forms</h2>'
+          '      <form action="/submit" method="post" autocomplete="on">'
+          '        <label for="name">Name:</label>'
+          
+            '        <input id="name" name="name" type="text" value="Ada Love' +
+            'lace" required>'
+          ''
+          '        <label for="email">Email:</label>'
+          
+            '        <input id="email" name="email" type="email" value="ada@e' +
+            'xample.com">'
+          ''
+          '        <label for="role">Role:</label>'
+          '        <select id="role" name="role">'
+          '          <option value="dev">Developer</option>'
+          '          <option value="qa" selected>QA</option>'
+          '          <option value="pm">PM</option>'
+          '        </select>'
+          ''
+          '        <label>'
+          '          <input type="checkbox" checked> Subscribe'
+          '        </label>'
+          ''
+          
+            '        <button type="submit" class="btn" data-action=save>Save<' +
+            '/button>'
+          
+            '        <button type="button" class="btn btn-secondary" disabled' +
+            '="disabled">Disabled</button>'
+          '      </form>'
+          '    </section>'
+          ''
+          '    <section id="section-media" class="card">'
+          '      <h2>Media</h2>'
+          ''
+          '      <figure class="figure">'
+          
+            '        <img src="preview.png" alt="Preview image" width="320" h' +
+            'eight="180">'
+          
+            '        <figcaption>Image with attributes and quoted strings.</f' +
+            'igcaption>'
+          '      </figure>'
+          ''
+          '      <p>'
+          
+            '        Inline code-ish text: <span class="code" data-x="1" data' +
+            '-y="2">x = y &amp;&amp; z</span>'
+          '      </p>'
+          ''
+          
+            '      <div class="box" style="padding: 8px; border: 1px solid #c' +
+            'cc;">'
+          '        <p>Style attribute: <strong>quoted</strong> values.</p>'
+          '      </div>'
+          '    </section>'
+          ''
+          '    <section id="section-tables" class="card">'
+          '      <h2>Tables</h2>'
+          '      <table class="table" aria-describedby="table-desc">'
+          '        <caption id="table-desc">Simple table</caption>'
+          '        <thead>'
+          '          <tr>'
+          '            <th scope="col">Key</th>'
+          '            <th scope="col">Value</th>'
+          '          </tr>'
+          '        </thead>'
+          '        <tbody>'
+          '          <tr>'
+          '            <td>language</td>'
+          '            <td>html</td>'
+          '          </tr>'
+          '          <tr>'
+          '            <td>file</td>'
+          '            <td>demo.htm</td>'
+          '          </tr>'
+          '        </tbody>'
+          '      </table>'
+          '    </section>'
+          ''
+          '    <section id="section-misc" class="card">'
+          '      <h2>Misc</h2>'
+          ''
+          '      <p>'
+          '        Self-closing-ish tags: <br> <hr>'
+          '      </p>'
+          ''
+          '      <p>'
+          '        Nested tags:'
+          '        <span class="outer" data-info="A &amp; B">'
+          '          outer <em class="inner">inner</em> outer'
+          '        </span>'
+          '      </p>'
+          ''
+          '      <p>'
+          
+            '        Unquoted attrs (still valid-ish in HTML): <input type=te' +
+            'xt value=unquoted data-flag=true>'
+          '      </p>'
+          ''
+          
+            '      <!-- <div class="not-real">This is inside a comment</div> ' +
+            '-->'
+          '    </section>'
+          '  </main>'
+          ''
+          '  <footer class="footer">'
+          '    <p>End of demo '#8212' jump to <a href="#top">top</a>.</p>'
+          '  </footer>'
+          '</body>'
+          '</html>')
+        StyledSettings = [Style, FontColor]
+        TextSettings.Font.Family = 'Consolas'
+        TextSettings.Font.Size = 14.000000000000000000
+        Align = Client
+        Size.Width = 955.000000000000000000
+        Size.Height = 611.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'memostyle_clear'
+        TabOrder = 0
+        OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
+        Viewport.Width = 925.000000000000000000
+        Viewport.Height = 599.000000000000000000
+      end
+    end
+    object TabItemCSS: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = False
+      Size.Width = 45.000000000000000000
+      Size.Height = 48.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = ''
+      TabOrder = 0
+      Text = 'CSS'
+      ExplicitSize.cx = 45.000000000000000000
+      ExplicitSize.cy = 48.000000000000000000
+      object MemoCSS: TMemo
+        Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+        CheckSpelling = True
+        DataDetectorTypes = []
+        Lines.Strings = (
+          ':root {'
+          '    --primary-color:#161719;'
+          '    --background-color:#161719;'
+          '    --background-color2:#0F0F0F;'
+          '    --input-background-color:#2B2F38;'
+          '    --input-text-color: #e8eaec;'
+          '    --box-shadow-color:#2B2F38;'
+          '    --button-hover-color:#161719;'
+          '    --button-hover-text-color: #e8eaec;'
+          '    --button-text-color: #e8eaec;'
+          '    --button-color:#161719;'
+          '    --text-light-color:#e8eaec;'
+          '    --text-dark-color: #7c8798;'
+          '    --header-color: #161719;'
+          '    --nav-color: #161719;'
+          '    --text-size-normal: 0.9rem;'
+          '    --font-family:"Montserrat", "Rubik", sans-serif;'
+          '    --font-heading-weight:bold; '
+          '    --modal-type:"fullscreen";'
+          '    --nav-width: 200px;'
+          '}'
+          'body {'
+          '    background: var(--background-color);'
+          '    border-color: var(--background-color);'
+          '}'
+          ''
+          '.ThemedColor {'
+          '    background: var(--background-color) !important;'
+          '    border-color: var(--primary-color) !important;'
+          '}'
+          '.ThemedColor2 {'
+          '    background: var(--background-color2) !important;'
+          '    border-color: var(--primary-color) !important;'
+          '}'
+          ''
+          '.ThemedColor[type], input, textarea, select {'
+          '    background: var(--input-background-color) !important;'
+          '    border-color: var(--primary-color) !important;'
+          '    color: var(--input-text-color) !important;'
+          '}'
+          '.ThemedText {'
+          '    color: var(--text-light-color) !important;'
+          '}'
+          'body {'
+          '    font-family: var(--font-family) !important;'
+          '    font-size: var(--text-size-normal) !important;'
+          '    color: var(--text-light-color) !important;'
+          '}'
+          ''
+          '.content-container-themed {'
+          '    background: var(--background-color) !important;'
+          '    border-color: var(--primary-color) !important;'
+          '    border-radius: 10px;'
+          '    border-width: 1px;'
+          '    border-style: solid;'
+          '}'
+          ''
+          '.content-container {'
+          '    padding: var(--bs-gutter-x,0.75rem);'
+          '    overflow: auto !important;'
+          '}'
+          ''
+          'header {'
+          '    background: var(--header-color) !important;'
+          '}'
+          ''
+          'nav {'
+          '    background: var(--nav-color) !important;'
+          '}'
+          ''
+          'hr {'
+          '    margin: 0.95rem 0;'
+          '}'
+          ''
+          'a {'
+          '    color: var(--text-light-color);'
+          '    text-decoration: none;'
+          '}'
+          'a:hover {'
+          '    color: var(--text-dark-color);'
+          '    text-decoration: none; '
+          '}'
+          ''
+          'button, .btn {'
+          '    font-size: 0.9rem;'
+          '}'
+          ''
+          'button:not(.btn-danger), .btn-primary {'
+          '    background: var(--button-color) !important;'
+          '    border-color: var(--primary-color) !important;'
+          '    color: var(--button-text-color) !important;'
+          '}'
+          ''
+          'button:not(.btn-danger):hover, .btn-primary:hover {'
+          '    background: var(--button-hover-color) !important;'
+          '    border-color: var(--primary-color) !important;'
+          '    color: var(--button-hover-text-color) !important;'
+          '}'
+          ''
+          '.tab-btn {'
+          '    background: rgba(255, 255, 255, 0) !important;'
+          '}'
+          ''
+          '.dropdown-menu {'
+          '    background: var(--background-color);'
+          '    border-color: var(--primary-color);'
+          '}'
+          '.dropdown-item {'
+          '    display: block;'
+          '    width: 100%;'
+          '    padding: 0.65rem 1rem;'
+          '    color: var(--text-dark-color);'
+          '    background: var(--background-color);'
+          '}'
+          'a.dropdown-item, tr.dropdown-item {'
+          '    cursor:pointer;'
+          '}'
+          '.dropdown-item:hover, .dropdown-item:focus {'
+          '    color: var(--text-dark-color);'
+          '    background: var(--background-color2); '
+          '}'
+          '.dropdown-item.active, .dropdown-item[active]{'
+          '    color: var(--text-light-color);'
+          '    background: var(--primary-color); '
+          '}'
+          '.dropdown-item.disabled {'
+          '    color: var(--text-dark-color);'
+          '    pointer-events: none;'
+          '}'
+          '.dropdown-toggle::after {'
+          '    color: var(--text-light-color);'
+          '}'
+          ''
+          '.dropdown-menu li{'
+          '    position: relative;'
+          '}'
+          '.dropdown-menu .submenu { '
+          '    display: none;'
+          '    position: absolute;'
+          '    left:100%; top:-7px;'
+          '}'
+          '.dropdown-menu .submenu-left{ '
+          '    right:100%; left:auto;'
+          '}'
+          '.dropdown-menu > li:hover > .submenu{'
+          '    display: block;'
+          '}')
+        StyledSettings = [Style, FontColor]
+        TextSettings.Font.Family = 'Consolas'
+        TextSettings.Font.Size = 14.000000000000000000
+        Align = Client
+        Size.Width = 955.000000000000000000
+        Size.Height = 611.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'memostyle_clear'
+        TabOrder = 0
+        OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
+        Viewport.Width = 925.000000000000000000
+        Viewport.Height = 599.000000000000000000
       end
     end
   end

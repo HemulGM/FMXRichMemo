@@ -7,7 +7,7 @@ uses
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Memo.Types,
   FMX.Controls.Presentation, FMX.ScrollBox, FMX.Memo, FMX.RichEdit.Style,
   FMX.TabControl, FMX.Objects, FMX.Filter.Effects, FMX.StdCtrls, FMX.Layouts,
-  FMX.Edit, FMX.EditBox, FMX.SpinBox;
+  FMX.Edit, FMX.EditBox, FMX.SpinBox, FMX.Colors;
 
 type
   TFormMain = class(TForm)
@@ -34,12 +34,19 @@ type
     CheckBoxErrorLine: TCheckBox;
     SpinBoxLineSpacing: TSpinBox;
     Label2: TLabel;
+    StyleBook1: TStyleBook;
+    CheckBoxRoundedSelection: TCheckBox;
+    CheckBoxSelectedTextColor: TCheckBox;
+    ComboColorBoxSelectedText: TComboColorBox;
     procedure CheckBoxCurrentLineChange(Sender: TObject);
     procedure CheckBoxErrorLineChange(Sender: TObject);
     procedure CheckBoxGutterChange(Sender: TObject);
     procedure MemoPascalPresentationNameChoosing(Sender: TObject; var PresenterName: string);
     procedure FormCreate(Sender: TObject);
     procedure SpinBoxLineSpacingChange(Sender: TObject);
+    procedure CheckBoxRoundedSelectionChange(Sender: TObject);
+    procedure ComboColorBoxSelectedTextChange(Sender: TObject);
+    procedure CheckBoxSelectedTextColorChange(Sender: TObject);
   private
     { Private declarations }
   public
@@ -87,6 +94,39 @@ begin
   TRichEditStyled(MemoPython.Presentation).ShowGutter := CheckBoxGutter.IsChecked;
   TRichEditStyled(MemoHTML.Presentation).ShowGutter := CheckBoxGutter.IsChecked;
   TRichEditStyled(MemoCSS.Presentation).ShowGutter := CheckBoxGutter.IsChecked;
+end;
+
+procedure TFormMain.CheckBoxRoundedSelectionChange(Sender: TObject);
+begin
+  TRichEditStyled(MemoPascal.Presentation).RoundedSelection := CheckBoxRoundedSelection.IsChecked;
+  TRichEditStyled(MemoJSON.Presentation).RoundedSelection := CheckBoxRoundedSelection.IsChecked;
+  TRichEditStyled(MemoSQL.Presentation).RoundedSelection := CheckBoxRoundedSelection.IsChecked;
+  TRichEditStyled(MemoMD.Presentation).RoundedSelection := CheckBoxRoundedSelection.IsChecked;
+  TRichEditStyled(MemoPython.Presentation).RoundedSelection := CheckBoxRoundedSelection.IsChecked;
+  TRichEditStyled(MemoHTML.Presentation).RoundedSelection := CheckBoxRoundedSelection.IsChecked;
+  TRichEditStyled(MemoCSS.Presentation).RoundedSelection := CheckBoxRoundedSelection.IsChecked;
+end;
+
+procedure TFormMain.CheckBoxSelectedTextColorChange(Sender: TObject);
+begin
+  TRichEditStyled(MemoPascal.Presentation).UseSelectedTextColor := CheckBoxSelectedTextColor.IsChecked;
+  TRichEditStyled(MemoJSON.Presentation).UseSelectedTextColor := CheckBoxSelectedTextColor.IsChecked;
+  TRichEditStyled(MemoSQL.Presentation).UseSelectedTextColor := CheckBoxSelectedTextColor.IsChecked;
+  TRichEditStyled(MemoMD.Presentation).UseSelectedTextColor := CheckBoxSelectedTextColor.IsChecked;
+  TRichEditStyled(MemoPython.Presentation).UseSelectedTextColor := CheckBoxSelectedTextColor.IsChecked;
+  TRichEditStyled(MemoHTML.Presentation).UseSelectedTextColor := CheckBoxSelectedTextColor.IsChecked;
+  TRichEditStyled(MemoCSS.Presentation).UseSelectedTextColor := CheckBoxSelectedTextColor.IsChecked;
+end;
+
+procedure TFormMain.ComboColorBoxSelectedTextChange(Sender: TObject);
+begin
+  TRichEditStyled(MemoPascal.Presentation).SelectedTextColor := ComboColorBoxSelectedText.Color;
+  TRichEditStyled(MemoJSON.Presentation).SelectedTextColor := ComboColorBoxSelectedText.Color;
+  TRichEditStyled(MemoSQL.Presentation).SelectedTextColor := ComboColorBoxSelectedText.Color;
+  TRichEditStyled(MemoMD.Presentation).SelectedTextColor := ComboColorBoxSelectedText.Color;
+  TRichEditStyled(MemoPython.Presentation).SelectedTextColor := ComboColorBoxSelectedText.Color;
+  TRichEditStyled(MemoHTML.Presentation).SelectedTextColor := ComboColorBoxSelectedText.Color;
+  TRichEditStyled(MemoCSS.Presentation).SelectedTextColor := ComboColorBoxSelectedText.Color;
 end;
 
 procedure TFormMain.MemoPascalPresentationNameChoosing(Sender: TObject; var PresenterName: string);

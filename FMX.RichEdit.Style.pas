@@ -15,6 +15,8 @@ type
     destructor Destroy; override;
   end;
 
+  TTextRange = FMX.TextLayout.TTextRange;
+
   TRichEditLinesLayout = class(TLinesLayout)
   private
     FSelectedRange: TDictionary<Integer, TTextRange>;
@@ -67,7 +69,7 @@ type
     FDragShift: TShiftState;
     FDragX, FDragY: Single;
     FCancelDrag, FNeedDefClick, FDragging: Boolean;
-    FLinesBackgroundColor: TDictionary<Integer, TAlphaColor>;
+    FLinesBackgroundColor: TObjectDictionary<Integer, TBrush>;
     FOnChangeCaretPos: TCaretPositionChanged;
     FGutterWidth: Single;
     FShowError: Boolean;
@@ -79,6 +81,12 @@ type
     FRoundedSelection: Boolean;
     FSelectedTextColor: TAlphaColor;
     FUseSelectedTextColor: Boolean;
+    FWordHighlight: TObjectDictionary<TTextRange, TStrokeBrush>;
+    FOnDrawAfter: TPaintEvent;
+    FOnDrawBefore: TPaintEvent;
+    FShowWordHighLight: Boolean;
+    FShowLinesBackgroundColor: Boolean;
+    FGutterNumberAllLines: Boolean;
     procedure DoChangeCaretPos(Sender: TObject; const ACaretPosition: TCaretPosition);
     procedure SetOnChangeCaretPos(const Value: TCaretPositionChanged);
     function GetCanCopy: Boolean;
@@ -99,6 +107,13 @@ type
     procedure RecalcGutter;
     procedure SetSelectedTextColor(const Value: TAlphaColor);
     procedure SetUseSelectedTextColor(const Value: Boolean);
+    procedure SetOnDrawAfter(const Value: TPaintEvent);
+    procedure SetOnDrawBefore(const Value: TPaintEvent);
+    procedure DoDrawBefore(ACanvas: TCanvas; const ARect: TRectF);
+    procedure DoDrawAfter(ACanvas: TCanvas; const ARect: TRectF);
+    procedure SetShowWordHighLight(const Value: Boolean);
+    procedure SetShowLinesBackgroundColor(const Value: Boolean);
+    procedure SetGutterNumberAllLines(const Value: Boolean);
   protected
     function CreateEditor: TTextEditor; override;
     procedure FGutterPaint(Sender: TObject; Canvas: TCanvas);
@@ -115,16 +130,18 @@ type
     procedure FillPopupMenu(const AMenu: TPopupMenu); override;
     procedure DoEnter; override;
     procedure DoExit; override;
+    procedure UpdateVisibleLayoutParams;
   public
     procedure Paint; override;
     procedure ApplyStyle; override;
     procedure FreeStyle; override;
-    function GetSelectionRectTest: TRectF;
-    procedure UpdateVisibleLayoutParams;
+    function GetTextRegion(const Range: TTextRange): TRegion;
     procedure SetCodeSyntaxName(const Lang: string; const DefFont: TFont; DefColor: TAlphaColor);
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    property LinesBackgroundColor: TDictionary<Integer, TAlphaColor> read FLinesBackgroundColor;
+    property LinesBackgroundColor: TObjectDictionary<Integer, TBrush> read FLinesBackgroundColor;
+    property ShowLinesBackgroundColor: Boolean read FShowLinesBackgroundColor write SetShowLinesBackgroundColor;
+    property WordHighlight: TObjectDictionary<TTextRange, TStrokeBrush> read FWordHighlight;
     property OnChangeCaretPos: TCaretPositionChanged read FOnChangeCaretPos write SetOnChangeCaretPos;
     property CanUndo: Boolean read GetCanUndo;
     property CanRedo: Boolean read GetCanRedo;
@@ -135,12 +152,16 @@ type
     property CanSelectAll: Boolean read GetCanSelectAll;
     property ShowGutter: Boolean read FShowGutter write SetShowGutter;
     property ShowError: Boolean read FShowError write SetShowError;
-    property ErrorLine: Int64 read FErrorLine write SetErrorLine;
     property ShowCurrentLine: Boolean read FShowCurrentLine write SetShowCurrentLine;
+    property ShowWordHighLight: Boolean read FShowWordHighLight write SetShowWordHighLight;
+    property ErrorLine: Int64 read FErrorLine write SetErrorLine;
     property LineSpacing: Single read FLineSpacing write SetLineSpacing;
     property RoundedSelection: Boolean read FRoundedSelection write SetRoundedSelection;
     property SelectedTextColor: TAlphaColor read FSelectedTextColor write SetSelectedTextColor;
     property UseSelectedTextColor: Boolean read FUseSelectedTextColor write SetUseSelectedTextColor;
+    property GutterNumberAllLines: Boolean read FGutterNumberAllLines write SetGutterNumberAllLines;
+    property OnDrawBefore: TPaintEvent read FOnDrawBefore write SetOnDrawBefore;
+    property OnDrawAfter: TPaintEvent read FOnDrawAfter write SetOnDrawAfter;
   end;
 
 implementation
@@ -433,37 +454,57 @@ begin
   ACanvas.BeginScene;
   try
     // Line number
-    var BRect := BoundsRect;
-    for var I := Max(0, Editor.LinesLayout.FirstVisibleLineIndex) to Min(Editor.LinesLayout.LastVisibleLineIndex, Editor.LinesLayout.Count - 1) do
-      if not Editor.LinesLayout[I].IsInvalidPosition then
+    var BRect := Content.BoundsRect;
+    for var i := Max(0, Editor.LinesLayout.FirstVisibleLineIndex) to Min(Editor.LinesLayout.LastVisibleLineIndex, Editor.LinesLayout.Count - 1) do
+      if not Editor.LinesLayout[i].IsInvalidPosition then
       begin
-        var Rect := Editor.LinesLayout[I].Rect;
-        Rect.Height := Editor.LinesLayout[I].Size.Height;
-        Rect.Offset(0, {-ViewportPosition.Y + }Content.Position.Y);
+        // Calc and normalize line rect
+        var Rect := Editor.LinesLayout[i].Rect;
+        Rect.Height := Editor.LinesLayout[i].Size.Height;
         Rect.Left := 0;
-        Rect.Width := 0;
+        Rect.Width := Max(Width, Content.Width);
         Rect.NormalizeRect;
         if (Rect.Top < 0) and (Rect.Bottom < 0) then
           Continue;
         if (Rect.Top > BRect.Height) and (Rect.Bottom > BRect.Height) then
           Continue;
 
-        if FShowError and (I = FErrorLine - 1) then
+        // Draw error line
+        if FShowError and (i = FErrorLine - 1) then
         begin
           ACanvas.Fill.Color := TAlphaColorRec.Red;
-          var R := Rect;
-          R.Width := Memo.Width;
-          R.Offset(-1, 0);
-          ACanvas.FillRect(R, 0.1);
-        end
-        else if FShowCurrentLine and (I = Memo.CaretPosition.Line) then
+          ACanvas.FillRect(Rect, 0.1);
+        end // Draw current line
+        else if FShowCurrentLine and (i = CaretPosition.Line) then
         begin
           ACanvas.Fill.Color := TAlphaColorRec.White;
-          var R := Rect;
-          R.Width := Memo.Width;
-          R.Offset(-1, 0);
-          ACanvas.FillRect(R, 0.1);
+          ACanvas.FillRect(Rect, 0.1);
+        end; // Draw custom line background
+        if FShowLinesBackgroundColor and FLinesBackgroundColor.ContainsKey(i) then
+        begin
+          var Brush := FLinesBackgroundColor.Items[i];
+          ACanvas.Fill.Assign(Brush);
+          ACanvas.FillRect(Rect, 1);
         end;
+      end;
+    // Draw range highlight
+    if FShowWordHighLight then
+      for var Item in FWordHighlight do
+      begin
+        var Region := GetTextRegion(Item.Key);
+        for var Rect in Region do
+          if Rect.Width > 3 then
+          begin
+            var R := Rect;
+            if R.Right < 0 then
+              Continue;
+            R.Left := Max(0, R.Left);
+            ACanvas.Stroke.Assign(Item.Value);
+            ACanvas.DrawLine(
+              TPointF.Create(R.Left, R.Bottom),
+              TPointF.Create(R.Right, R.Bottom),
+              1);
+          end;
       end;
   finally
     ACanvas.EndScene;
@@ -478,7 +519,7 @@ begin
   try
     Canvas.Font.Assign(Memo.TextSettings.Font);
     // Line number
-    var BRect := BoundsRect;
+    var BRect := Content.BoundsRect;
     for var I := Max(0, Editor.LinesLayout.FirstVisibleLineIndex) to Min(Editor.LinesLayout.LastVisibleLineIndex, Editor.LinesLayout.Count - 1) do
       if not Editor.LinesLayout[I].IsInvalidPosition then
       begin
@@ -486,25 +527,46 @@ begin
         Rect.Height := Editor.LinesLayout[I].Size.Height;
         Rect.Offset(0, -ViewportPosition.Y);
         Rect.Left := 0;
-        Rect.Width := FGutterWidth - 10;
+        Rect.Width := FGutterWidth;
         Rect.NormalizeRect;
         if (Rect.Top < 0) and (Rect.Bottom < 0) then
           Continue;
         if (Rect.Top > BRect.Height) and (Rect.Bottom > BRect.Height) then
           Continue;
 
-        Canvas.Fill.Color := TAlphaColorRec.White;
-        var DeltaOpacity: Single := (100 / Editor.LinesLayout.Items[I].Rect.Height * Rect.Height) / 100;
+        // Draw error line
+        if FShowError and (i = FErrorLine - 1) then
+        begin
+          Canvas.Fill.Color := TAlphaColorRec.Red;
+          Canvas.FillRect(Rect, 0.1);
+        end // Draw current line
+        else if FShowCurrentLine and (i = CaretPosition.Line) then
+        begin
+          Canvas.Fill.Color := TAlphaColorRec.White;
+          Canvas.FillRect(Rect, 0.1);
+        end; // Draw custom line background
 
-        Canvas.FillText(Rect, (I + 1).ToString, False, 0.3 * DeltaOpacity, [], TTextAlign.Trailing, TTextAlign.Center);
+          Rect.Width := FGutterWidth - 10;
+          Canvas.Fill.Color := TAlphaColorRec.White;
+
+          var NumOpacity := 0.3;
+          if i = CaretPosition.Line then
+            NumOpacity := 0.6;
+
+        if FGutterNumberAllLines or (i = 0) or ((i + 1) mod 10 = 0) or (i = CaretPosition.Line) then
+        begin
+          Canvas.FillText(Rect, (i + 1).ToString, False, NumOpacity, [], TTextAlign.Trailing, TTextAlign.Center);
+        end
+        else
+          Canvas.FillText(Rect, '·', False, NumOpacity, [], TTextAlign.Trailing, TTextAlign.Center);
       end;
 
     Canvas.Stroke.Kind := TBrushKind.Solid;
     Canvas.Stroke.Color := TAlphaColorRec.White;
     Canvas.Stroke.Thickness := 1;
     Canvas.DrawLine(
-      Canvas.AlignToPixel(TPointF.Create(FGutterWidth - 1, BRect.Top)),
-      Canvas.AlignToPixel(TPointF.Create(FGutterWidth - 1, BRect.Bottom)), 0.3);
+      Canvas.AlignToPixel(TPointF.Create(FGutterWidth - 1, BRect.Top - 5)),
+      Canvas.AlignToPixel(TPointF.Create(FGutterWidth - 1, BRect.Bottom + 5)), 0.3);
   finally
     Canvas.EndScene;
   end;
@@ -525,7 +587,6 @@ end;
 procedure TRichEditStyled.Paint;
 begin
   inherited;
-  DrawHighlightLines(Canvas);
 end;
 
 procedure TRichEditStyled.PaintChildren;
@@ -539,13 +600,14 @@ begin
   var Content: TLayout;
   if FindStyleResource<TLayout>('content', Content) then
   begin
+    // Gutter
     FGutterControl := TMemoGutter.Create(Content.Parent);
     Content.Parent.AddObject(FGutterControl);
     FGutterControl.Align := TAlignLayout.MostLeft;
     FGutterControl.Width := 0;
     FGutterControl.OnPaint := FGutterPaint;
     FGutterControl.Margins.Rect := Content.Margins.Rect;
-    FGutterControl.Margins.Right := 0;
+    FGutterControl.Margins.Right := -12;
     Content.Margins.Left := 0;
     RecalcGutter;
   end;
@@ -553,7 +615,11 @@ end;
 
 procedure TRichEditStyled.InternalContentPaint(Sender: TObject; ACanvas: TCanvas; const ARect: TRectF);
 begin
+  DrawHighlightLines(ACanvas);
+  // Draw content
+  DoDrawBefore(ACanvas, ARect);
   ContentPaint(Sender, ACanvas, ARect);
+  DoDrawAfter(ACanvas, ARect);
 end;
 
 constructor TRichEditStyled.Create(AOwner: TComponent);
@@ -561,7 +627,9 @@ begin
   inherited;
   DisableDisappear := True;
   FLineSpacing := 1;
-  FLinesBackgroundColor := TDictionary<Integer, TAlphaColor>.Create;
+  FGutterNumberAllLines := True;
+  FLinesBackgroundColor := TObjectDictionary<Integer, TBrush>.Create([doOwnsValues]);
+  FWordHighlight := TObjectDictionary<TTextRange, TStrokeBrush>.Create([doOwnsValues]);
 end;
 
 function TRichEditStyled.CreateEditor: TTextEditor;
@@ -573,6 +641,7 @@ end;
 destructor TRichEditStyled.Destroy;
 begin
   FLinesBackgroundColor.Free;
+  FWordHighlight.Free;
   inherited;
 end;
 
@@ -581,6 +650,18 @@ begin
   if Assigned(FOnChangeCaretPos) then
     FOnChangeCaretPos(Self, ACaretPosition);
   Repaint;
+end;
+
+procedure TRichEditStyled.DoDrawAfter(ACanvas: TCanvas; const ARect: TRectF);
+begin
+  if Assigned(FOnDrawAfter) then
+    FOnDrawAfter(Self, ACanvas);
+end;
+
+procedure TRichEditStyled.DoDrawBefore(ACanvas: TCanvas; const ARect: TRectF);
+begin
+  if Assigned(FOnDrawBefore) then
+    FOnDrawBefore(Self, ACanvas);
 end;
 
 procedure TRichEditStyled.DoEnter;
@@ -684,9 +765,10 @@ begin
   Result := not Model.ReadOnly and UndoManager.CanUndo;
 end;
 
-function TRichEditStyled.GetSelectionRectTest: TRectF;
+function TRichEditStyled.GetTextRegion(const Range: TTextRange): TRegion;
 begin
-  Result := GetSelectionRect;
+  var LCaret := Editor.Lines.TextPosToPos(Range.Pos);
+  Result := Editor.LinesLayout.GetRegionForRange(LCaret, Range.Length);
 end;
 
 procedure TRichEditStyled.MMLinesChanged(var Message: TDispatchMessage);
@@ -697,7 +779,6 @@ end;
 
 procedure TRichEditStyled.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  LinesBackgroundColor.Clear;
   // sorry dragdrop in progress
   {
   var R := GetSelectionRect;
@@ -767,6 +848,12 @@ begin
   Repaint;
 end;
 
+procedure TRichEditStyled.SetGutterNumberAllLines(const Value: Boolean);
+begin
+  FGutterNumberAllLines := Value;
+  Repaint;
+end;
+
 procedure TRichEditStyled.SetLineSpacing(const Value: Single);
 begin
   FLineSpacing := Value;
@@ -778,6 +865,16 @@ end;
 procedure TRichEditStyled.SetOnChangeCaretPos(const Value: TCaretPositionChanged);
 begin
   FOnChangeCaretPos := Value;
+end;
+
+procedure TRichEditStyled.SetOnDrawAfter(const Value: TPaintEvent);
+begin
+  FOnDrawAfter := Value;
+end;
+
+procedure TRichEditStyled.SetOnDrawBefore(const Value: TPaintEvent);
+begin
+  FOnDrawBefore := Value;
 end;
 
 procedure TRichEditStyled.SetRoundedSelection(const Value: Boolean);
@@ -812,6 +909,18 @@ begin
   FShowGutter := Value;
   RecalcGutter;
   RealignContent;
+end;
+
+procedure TRichEditStyled.SetShowLinesBackgroundColor(const Value: Boolean);
+begin
+  FShowLinesBackgroundColor := Value;
+  Repaint;
+end;
+
+procedure TRichEditStyled.SetShowWordHighLight(const Value: Boolean);
+begin
+  FShowWordHighLight := Value;
+  Repaint;
 end;
 
 procedure TRichEditStyled.SetUseSelectedTextColor(const Value: Boolean);

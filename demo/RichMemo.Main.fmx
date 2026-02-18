@@ -18,7 +18,7 @@ object FormMain: TFormMain
     Margins.Top = 10.000000000000000000
     Margins.Right = 10.000000000000000000
     Margins.Bottom = 10.000000000000000000
-    Size.Width = 740.000000000000000000
+    Size.Width = 705.000000000000000000
     Size.Height = 659.000000000000000000
     Size.PlatformDefault = False
     TabHeight = 48.000000000000000000
@@ -26,19 +26,19 @@ object FormMain: TFormMain
     TabOrder = 0
     TabPosition = PlatformDefault
     Sizes = (
-      740s
+      705s
       611s
-      740s
+      705s
       611s
-      740s
+      705s
       611s
-      740s
+      705s
       611s
-      740s
+      705s
       611s
-      740s
+      705s
       611s
-      740s
+      705s
       611s)
     object TabItemPascal: TTabItem
       CustomIcon = <
@@ -244,13 +244,13 @@ object FormMain: TFormMain
         TextSettings.Font.Family = 'Consolas'
         TextSettings.Font.Size = 14.000000000000000000
         Align = Client
-        Size.Width = 740.000000000000000000
+        Size.Width = 705.000000000000000000
         Size.Height = 611.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 710.000000000000000000
+        Viewport.Width = 675.000000000000000000
         Viewport.Height = 587.000000000000000000
       end
     end
@@ -461,14 +461,14 @@ object FormMain: TFormMain
         TextSettings.Font.Family = 'Consolas'
         TextSettings.Font.Size = 14.000000000000000000
         Align = Client
-        Size.Width = 740.000000000000000000
+        Size.Width = 705.000000000000000000
         Size.Height = 611.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 740.000000000000000000
-        Viewport.Height = 611.000000000000000000
+        Viewport.Width = 675.000000000000000000
+        Viewport.Height = 587.000000000000000000
       end
     end
     object TabItemSQL: TTabItem
@@ -533,14 +533,14 @@ object FormMain: TFormMain
         TextSettings.Font.Family = 'Consolas'
         TextSettings.Font.Size = 14.000000000000000000
         Align = Client
-        Size.Width = 740.000000000000000000
+        Size.Width = 705.000000000000000000
         Size.Height = 611.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 740.000000000000000000
-        Viewport.Height = 611.000000000000000000
+        Viewport.Width = 675.000000000000000000
+        Viewport.Height = 587.000000000000000000
       end
     end
     object TabItemPython: TTabItem
@@ -593,14 +593,14 @@ object FormMain: TFormMain
         TextSettings.Font.Family = 'Consolas'
         TextSettings.Font.Size = 14.000000000000000000
         Align = Client
-        Size.Width = 740.000000000000000000
+        Size.Width = 705.000000000000000000
         Size.Height = 611.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 740.000000000000000000
-        Viewport.Height = 611.000000000000000000
+        Viewport.Width = 687.000000000000000000
+        Viewport.Height = 599.000000000000000000
       end
     end
     object TabItemMD: TTabItem
@@ -910,14 +910,14 @@ object FormMain: TFormMain
         TextSettings.Font.Family = 'Consolas'
         TextSettings.Font.Size = 14.000000000000000000
         Align = Client
-        Size.Width = 740.000000000000000000
+        Size.Width = 705.000000000000000000
         Size.Height = 611.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 740.000000000000000000
-        Viewport.Height = 611.000000000000000000
+        Viewport.Width = 675.000000000000000000
+        Viewport.Height = 587.000000000000000000
       end
     end
     object TabItemHTML: TTabItem
@@ -1088,14 +1088,14 @@ object FormMain: TFormMain
         TextSettings.Font.Family = 'Consolas'
         TextSettings.Font.Size = 14.000000000000000000
         Align = Client
-        Size.Width = 740.000000000000000000
+        Size.Width = 705.000000000000000000
         Size.Height = 611.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 740.000000000000000000
-        Viewport.Height = 611.000000000000000000
+        Viewport.Width = 675.000000000000000000
+        Viewport.Height = 587.000000000000000000
       end
     end
     object TabItemCSS: TTabItem
@@ -1268,13 +1268,13 @@ object FormMain: TFormMain
         TextSettings.Font.Family = 'Consolas'
         TextSettings.Font.Size = 14.000000000000000000
         Align = Client
-        Size.Width = 740.000000000000000000
+        Size.Width = 705.000000000000000000
         Size.Height = 611.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 710.000000000000000000
+        Viewport.Width = 675.000000000000000000
         Viewport.Height = 599.000000000000000000
       end
     end
@@ -39068,7 +39068,7 @@ object FormMain: TFormMain
     Padding.Top = 10.000000000000000000
     Padding.Right = 10.000000000000000000
     Padding.Bottom = 10.000000000000000000
-    Size.Width = 215.000000000000000000
+    Size.Width = 250.000000000000000000
     Size.Height = 679.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 2
@@ -39077,11 +39077,11 @@ object FormMain: TFormMain
       Margins.Bottom = 10.000000000000000000
       Position.X = 10.000000000000000000
       Position.Y = 62.000000000000000000
-      Size.Width = 195.000000000000000000
+      Size.Width = 230.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = 'checkboxstyle_switch_lefttext'
-      TabOrder = 4
+      TabOrder = 9
       Text = 'Gutter'
       OnChange = CheckBoxGutterChange
     end
@@ -39090,23 +39090,23 @@ object FormMain: TFormMain
       Margins.Bottom = 35.000000000000000000
       Position.X = 10.000000000000000000
       Position.Y = 10.000000000000000000
-      Size.Width = 195.000000000000000000
+      Size.Width = 230.000000000000000000
       Size.Height = 17.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = 'labelstyle_subtitle'
       Text = 'RichMemo Demo'
-      TabOrder = 5
+      TabOrder = 10
     end
     object CheckBoxCurrentLine: TCheckBox
       Align = Top
       Margins.Bottom = 10.000000000000000000
       Position.X = 10.000000000000000000
-      Position.Y = 104.000000000000000000
-      Size.Width = 195.000000000000000000
+      Position.Y = 146.000000000000000000
+      Size.Width = 230.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = 'checkboxstyle_switch_lefttext'
-      TabOrder = 3
+      TabOrder = 7
       Text = 'Current line'
       OnChange = CheckBoxCurrentLineChange
     end
@@ -39114,19 +39114,19 @@ object FormMain: TFormMain
       Align = Top
       Margins.Bottom = 10.000000000000000000
       Position.X = 10.000000000000000000
-      Position.Y = 146.000000000000000000
-      Size.Width = 195.000000000000000000
+      Position.Y = 188.000000000000000000
+      Size.Width = 230.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = 'checkboxstyle_switch_lefttext'
-      TabOrder = 2
+      TabOrder = 6
       Text = 'Error line'
       OnChange = CheckBoxErrorLineChange
     end
     object SpinBoxLineSpacing: TSpinBox
       Touch.InteractiveGestures = [LongTap, DoubleTap]
       Align = Top
-      TabOrder = 6
+      TabOrder = 11
       Cursor = crIBeam
       Min = 1.000000000000000000
       Max = 10.000000000000000000
@@ -39134,18 +39134,18 @@ object FormMain: TFormMain
       ValueType = Float
       Increment = 0.100000001490116100
       KeyboardType = NumbersAndPunctuation
-      Position.X = 100.000000000000000000
-      Position.Y = 314.000000000000000000
-      Margins.Left = 90.000000000000000000
-      Size.Width = 105.000000000000000000
+      Position.X = 130.000000000000000000
+      Position.Y = 482.000000000000000000
+      Margins.Left = 120.000000000000000000
+      Size.Width = 110.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
       OnChange = SpinBoxLineSpacingChange
       OnChangeTracking = SpinBoxLineSpacingChange
       object Label2: TLabel
         Align = Left
-        Margins.Left = -90.000000000000000000
-        Position.X = -90.000000000000000000
+        Margins.Left = -120.000000000000000000
+        Position.X = -120.000000000000000000
         Size.Width = 120.000000000000000000
         Size.Height = 32.000000000000000000
         Size.PlatformDefault = False
@@ -39157,12 +39157,12 @@ object FormMain: TFormMain
       Align = Top
       Margins.Bottom = 10.000000000000000000
       Position.X = 10.000000000000000000
-      Position.Y = 188.000000000000000000
-      Size.Width = 195.000000000000000000
+      Position.Y = 272.000000000000000000
+      Size.Width = 230.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = 'checkboxstyle_switch_lefttext'
-      TabOrder = 1
+      TabOrder = 5
       Text = 'Rounded selection'
       OnChange = CheckBoxRoundedSelectionChange
     end
@@ -39170,26 +39170,94 @@ object FormMain: TFormMain
       Align = Top
       Margins.Bottom = 10.000000000000000000
       Position.X = 10.000000000000000000
-      Position.Y = 230.000000000000000000
-      Size.Width = 195.000000000000000000
+      Position.Y = 314.000000000000000000
+      Size.Width = 230.000000000000000000
+      Size.Height = 32.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'checkboxstyle_switch_lefttext'
+      TabOrder = 4
+      Text = 'Selected text color'
+      OnChange = CheckBoxSelectedTextColorChange
+      object ComboColorBoxSelectedText: TComboColorBox
+        Align = Right
+        Color = claWhite
+        Margins.Top = 4.000000000000000000
+        Margins.Right = 45.000000000000000000
+        Margins.Bottom = 4.000000000000000000
+        Position.X = 127.000000000000000000
+        Position.Y = 4.000000000000000000
+        Size.Width = 58.000000000000000000
+        Size.Height = 24.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 170
+        OnChange = ComboColorBoxSelectedTextChange
+      end
+    end
+    object CheckBoxWordHighlight: TCheckBox
+      Align = Top
+      Margins.Bottom = 10.000000000000000000
+      Position.X = 10.000000000000000000
+      Position.Y = 356.000000000000000000
+      Size.Width = 230.000000000000000000
+      Size.Height = 32.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'checkboxstyle_switch_lefttext'
+      TabOrder = 3
+      Text = 'Word highlight'
+      OnChange = CheckBoxWordHighlightChange
+    end
+    object CheckBoxDrawBefore: TCheckBox
+      Align = Top
+      Margins.Bottom = 10.000000000000000000
+      Position.X = 10.000000000000000000
+      Position.Y = 398.000000000000000000
+      Size.Width = 230.000000000000000000
+      Size.Height = 32.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'checkboxstyle_switch_lefttext'
+      TabOrder = 1
+      Text = 'Draw before'
+      OnChange = CheckBoxDrawBeforeChange
+    end
+    object CheckBoxDrawAfter: TCheckBox
+      Align = Top
+      Margins.Bottom = 10.000000000000000000
+      Position.X = 10.000000000000000000
+      Position.Y = 440.000000000000000000
+      Size.Width = 230.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = 'checkboxstyle_switch_lefttext'
       TabOrder = 0
-      Text = 'Selected text color'
-      OnChange = CheckBoxSelectedTextColorChange
+      Text = 'Draw after'
+      OnChange = CheckBoxDrawBeforeChange
     end
-    object ComboColorBoxSelectedText: TComboColorBox
+    object CheckBoxLineBG: TCheckBox
       Align = Top
-      Color = claWhite
       Margins.Bottom = 10.000000000000000000
       Position.X = 10.000000000000000000
-      Position.Y = 272.000000000000000000
-      Size.Width = 195.000000000000000000
+      Position.Y = 230.000000000000000000
+      Size.Width = 230.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 7
-      OnChange = ComboColorBoxSelectedTextChange
+      StyleLookup = 'checkboxstyle_switch_lefttext'
+      TabOrder = 2
+      Text = 'Custom line BG'
+      OnChange = CheckBoxLineBGChange
+    end
+    object CheckBoxGutterNumberAllLines: TCheckBox
+      Align = Top
+      IsChecked = True
+      Margins.Bottom = 10.000000000000000000
+      Position.X = 10.000000000000000000
+      Position.Y = 104.000000000000000000
+      Size.Width = 230.000000000000000000
+      Size.Height = 32.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'checkboxstyle_switch_lefttext'
+      TabOrder = 8
+      Text = 'Gutter number all lines'
+      OnChange = CheckBoxGutterNumberAllLinesChange
     end
   end
   object StyleBook1: TStyleBook

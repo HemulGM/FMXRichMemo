@@ -38,6 +38,11 @@ type
     CheckBoxRoundedSelection: TCheckBox;
     CheckBoxSelectedTextColor: TCheckBox;
     ComboColorBoxSelectedText: TComboColorBox;
+    CheckBoxWordHighlight: TCheckBox;
+    CheckBoxDrawBefore: TCheckBox;
+    CheckBoxDrawAfter: TCheckBox;
+    CheckBoxLineBG: TCheckBox;
+    CheckBoxGutterNumberAllLines: TCheckBox;
     procedure CheckBoxCurrentLineChange(Sender: TObject);
     procedure CheckBoxErrorLineChange(Sender: TObject);
     procedure CheckBoxGutterChange(Sender: TObject);
@@ -47,7 +52,13 @@ type
     procedure CheckBoxRoundedSelectionChange(Sender: TObject);
     procedure ComboColorBoxSelectedTextChange(Sender: TObject);
     procedure CheckBoxSelectedTextColorChange(Sender: TObject);
+    procedure CheckBoxWordHighlightChange(Sender: TObject);
+    procedure CheckBoxDrawBeforeChange(Sender: TObject);
+    procedure CheckBoxLineBGChange(Sender: TObject);
+    procedure CheckBoxGutterNumberAllLinesChange(Sender: TObject);
   private
+    procedure FOnMemoDrawAfter(Sender: TObject; ACanvas: TCanvas);
+    procedure FOnMemoDrawBefore(Sender: TObject; ACanvas: TCanvas);
     { Private declarations }
   public
     { Public declarations }
@@ -74,6 +85,17 @@ begin
   TRichEditStyled(MemoCSS.Presentation).ShowCurrentLine := CheckBoxCurrentLine.IsChecked;
 end;
 
+procedure TFormMain.CheckBoxDrawBeforeChange(Sender: TObject);
+begin
+  MemoPascal.Repaint;
+  MemoJSON.Repaint;
+  MemoSQL.Repaint;
+  MemoMD.Repaint;
+  MemoPython.Repaint;
+  MemoHTML.Repaint;
+  MemoCSS.Repaint;
+end;
+
 procedure TFormMain.CheckBoxErrorLineChange(Sender: TObject);
 begin
   TRichEditStyled(MemoPascal.Presentation).ShowError := CheckBoxErrorLine.IsChecked;
@@ -94,6 +116,28 @@ begin
   TRichEditStyled(MemoPython.Presentation).ShowGutter := CheckBoxGutter.IsChecked;
   TRichEditStyled(MemoHTML.Presentation).ShowGutter := CheckBoxGutter.IsChecked;
   TRichEditStyled(MemoCSS.Presentation).ShowGutter := CheckBoxGutter.IsChecked;
+end;
+
+procedure TFormMain.CheckBoxGutterNumberAllLinesChange(Sender: TObject);
+begin
+  TRichEditStyled(MemoPascal.Presentation).GutterNumberAllLines := CheckBoxGutterNumberAllLines.IsChecked;
+  TRichEditStyled(MemoJSON.Presentation).GutterNumberAllLines := CheckBoxGutterNumberAllLines.IsChecked;
+  TRichEditStyled(MemoSQL.Presentation).GutterNumberAllLines := CheckBoxGutterNumberAllLines.IsChecked;
+  TRichEditStyled(MemoMD.Presentation).GutterNumberAllLines := CheckBoxGutterNumberAllLines.IsChecked;
+  TRichEditStyled(MemoPython.Presentation).GutterNumberAllLines := CheckBoxGutterNumberAllLines.IsChecked;
+  TRichEditStyled(MemoHTML.Presentation).GutterNumberAllLines := CheckBoxGutterNumberAllLines.IsChecked;
+  TRichEditStyled(MemoCSS.Presentation).GutterNumberAllLines := CheckBoxGutterNumberAllLines.IsChecked;
+end;
+
+procedure TFormMain.CheckBoxLineBGChange(Sender: TObject);
+begin
+  TRichEditStyled(MemoPascal.Presentation).ShowLinesBackgroundColor := CheckBoxLineBG.IsChecked;
+  TRichEditStyled(MemoJSON.Presentation).ShowLinesBackgroundColor := CheckBoxLineBG.IsChecked;
+  TRichEditStyled(MemoSQL.Presentation).ShowLinesBackgroundColor := CheckBoxLineBG.IsChecked;
+  TRichEditStyled(MemoMD.Presentation).ShowLinesBackgroundColor := CheckBoxLineBG.IsChecked;
+  TRichEditStyled(MemoPython.Presentation).ShowLinesBackgroundColor := CheckBoxLineBG.IsChecked;
+  TRichEditStyled(MemoHTML.Presentation).ShowLinesBackgroundColor := CheckBoxLineBG.IsChecked;
+  TRichEditStyled(MemoCSS.Presentation).ShowLinesBackgroundColor := CheckBoxLineBG.IsChecked;
 end;
 
 procedure TFormMain.CheckBoxRoundedSelectionChange(Sender: TObject);
@@ -118,6 +162,17 @@ begin
   TRichEditStyled(MemoCSS.Presentation).UseSelectedTextColor := CheckBoxSelectedTextColor.IsChecked;
 end;
 
+procedure TFormMain.CheckBoxWordHighlightChange(Sender: TObject);
+begin
+  TRichEditStyled(MemoPascal.Presentation).ShowWordHighLight := CheckBoxWordHighlight.IsChecked;
+  TRichEditStyled(MemoJSON.Presentation).ShowWordHighLight := CheckBoxWordHighlight.IsChecked;
+  TRichEditStyled(MemoSQL.Presentation).ShowWordHighLight := CheckBoxWordHighlight.IsChecked;
+  TRichEditStyled(MemoMD.Presentation).ShowWordHighLight := CheckBoxWordHighlight.IsChecked;
+  TRichEditStyled(MemoPython.Presentation).ShowWordHighLight := CheckBoxWordHighlight.IsChecked;
+  TRichEditStyled(MemoHTML.Presentation).ShowWordHighLight := CheckBoxWordHighlight.IsChecked;
+  TRichEditStyled(MemoCSS.Presentation).ShowWordHighLight := CheckBoxWordHighlight.IsChecked;
+end;
+
 procedure TFormMain.ComboColorBoxSelectedTextChange(Sender: TObject);
 begin
   TRichEditStyled(MemoPascal.Presentation).SelectedTextColor := ComboColorBoxSelectedText.Color;
@@ -135,6 +190,24 @@ begin
   PresenterName := 'RichEditStyled';
 end;
 
+procedure TFormMain.FOnMemoDrawBefore(Sender: TObject; ACanvas: TCanvas);
+begin
+  if not CheckBoxDrawBefore.IsChecked then
+    Exit;
+  ACanvas.Fill.Kind := TBrushKind.Solid;
+  ACanvas.Fill.Color := TAlphaColors.Green;
+  ACanvas.FillEllipse(TRectF.Create(140, 140, 240, 240), 1);
+end;
+
+procedure TFormMain.FOnMemoDrawAfter(Sender: TObject; ACanvas: TCanvas);
+begin
+  if not CheckBoxDrawAfter.IsChecked then
+    Exit;
+  ACanvas.Fill.Kind := TBrushKind.Solid;
+  ACanvas.Fill.Color := TAlphaColors.Dimgrey;
+  ACanvas.FillEllipse(TRectF.Create(40, 40, 140, 140), 1);
+end;
+
 procedure TFormMain.FormCreate(Sender: TObject);
 begin
   MemoPascal.ScrollAnimation := TBehaviorBoolean.True;
@@ -150,42 +223,107 @@ begin
   begin
     TRichEditStyled(MemoPascal.Presentation).SetCodeSyntaxName('pascal', MemoPascal.Font, MemoPascal.FontColor);
     TRichEditStyled(MemoPascal.Presentation).ErrorLine := 10;
+
+    var Stroke := TStrokeBrush.Create(TBrushKind.Solid, TAlphaColors.Red);
+    Stroke.Thickness := 2;
+    Stroke.Dash := TStrokeDash.Dot;
+    TRichEditStyled(MemoPascal.Presentation).WordHighlight.Add(
+        TTextRange.Create(1, 40),
+        Stroke
+      );
+    TRichEditStyled(MemoPascal.Presentation).OnDrawBefore := FOnMemoDrawBefore;
+    TRichEditStyled(MemoPascal.Presentation).OnDrawAfter := FOnMemoDrawAfter;
+
+    var Brush := TBrush.Create(TBrushKind.Gradient, TAlphaColors.Red);
+    Brush.Gradient.Color := $99FF0000;
+    Brush.Gradient.Color1 := $00FF0000;
+    Brush.Gradient.StartPosition.Point := TPointF.Create(0.5, 0.5);
+    Brush.Gradient.StopPosition.Point := TPointF.Create(1, 0.5);
+    TRichEditStyled(MemoPascal.Presentation).LinesBackgroundColor.Add(44, Brush);
   end;
 
   if MemoJSON.Presentation is TRichEditStyled then
   begin
     TRichEditStyled(MemoJSON.Presentation).SetCodeSyntaxName('json', MemoJSON.Font, MemoJSON.FontColor);
     TRichEditStyled(MemoJSON.Presentation).ErrorLine := 10;
+
+    var Stroke := TStrokeBrush.Create(TBrushKind.Solid, TAlphaColors.Red);
+    Stroke.Thickness := 2;
+    Stroke.Dash := TStrokeDash.Dot;
+    TRichEditStyled(MemoJSON.Presentation).WordHighlight.Add(
+        TTextRange.Create(1, 40),
+        Stroke
+      );
   end;
 
   if MemoSQL.Presentation is TRichEditStyled then
   begin
     TRichEditStyled(MemoSQL.Presentation).SetCodeSyntaxName('sql', MemoSQL.Font, MemoSQL.FontColor);
     TRichEditStyled(MemoSQL.Presentation).ErrorLine := 10;
+
+    var Stroke := TStrokeBrush.Create(TBrushKind.Solid, TAlphaColors.Red);
+    Stroke.Thickness := 2;
+    Stroke.Dash := TStrokeDash.Dot;
+    TRichEditStyled(MemoSQL.Presentation).WordHighlight.Add(
+        TTextRange.Create(1, 40),
+        Stroke
+      );
   end;
 
   if MemoMD.Presentation is TRichEditStyled then
   begin
     TRichEditStyled(MemoMD.Presentation).SetCodeSyntaxName('md', MemoMD.Font, MemoMD.FontColor);
     TRichEditStyled(MemoMD.Presentation).ErrorLine := 10;
+
+    var Stroke := TStrokeBrush.Create(TBrushKind.Solid, TAlphaColors.Red);
+    Stroke.Thickness := 2;
+    Stroke.Dash := TStrokeDash.Dot;
+    TRichEditStyled(MemoMD.Presentation).WordHighlight.Add(
+        TTextRange.Create(1, 40),
+        Stroke
+      );
   end;
 
   if MemoPython.Presentation is TRichEditStyled then
   begin
     TRichEditStyled(MemoPython.Presentation).SetCodeSyntaxName('python', MemoPython.Font, MemoPython.FontColor);
     TRichEditStyled(MemoPython.Presentation).ErrorLine := 10;
+
+    var Stroke := TStrokeBrush.Create(TBrushKind.Solid, TAlphaColors.Red);
+    Stroke.Thickness := 2;
+    Stroke.Dash := TStrokeDash.Dot;
+    TRichEditStyled(MemoPython.Presentation).WordHighlight.Add(
+        TTextRange.Create(1, 40),
+        Stroke
+      );
   end;
 
   if MemoHTML.Presentation is TRichEditStyled then
   begin
     TRichEditStyled(MemoHTML.Presentation).SetCodeSyntaxName('html', MemoHTML.Font, MemoHTML.FontColor);
     TRichEditStyled(MemoHTML.Presentation).ErrorLine := 10;
+
+    var Stroke := TStrokeBrush.Create(TBrushKind.Solid, TAlphaColors.Red);
+    Stroke.Thickness := 2;
+    Stroke.Dash := TStrokeDash.Dot;
+    TRichEditStyled(MemoHTML.Presentation).WordHighlight.Add(
+        TTextRange.Create(1, 40),
+        Stroke
+      );
   end;
 
   if MemoCSS.Presentation is TRichEditStyled then
   begin
     TRichEditStyled(MemoCSS.Presentation).SetCodeSyntaxName('css', MemoCSS.Font, MemoCSS.FontColor);
     TRichEditStyled(MemoCSS.Presentation).ErrorLine := 10;
+
+    var Stroke := TStrokeBrush.Create(TBrushKind.Solid, TAlphaColors.Red);
+    Stroke.Thickness := 2;
+    Stroke.Dash := TStrokeDash.Dot;
+    TRichEditStyled(MemoCSS.Presentation).WordHighlight.Add(
+        TTextRange.Create(1, 40),
+        Stroke
+      );
   end;
 end;
 
@@ -198,7 +336,6 @@ begin
   TRichEditStyled(MemoPython.Presentation).LineSpacing := SpinBoxLineSpacing.Value;
   TRichEditStyled(MemoHTML.Presentation).LineSpacing := SpinBoxLineSpacing.Value;
   TRichEditStyled(MemoCSS.Presentation).LineSpacing := SpinBoxLineSpacing.Value;
-
 end;
 
 end.

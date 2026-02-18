@@ -1,4 +1,6 @@
 # FMXRichMemo
+![logo](https://github.com/HemulGM/FMXRichMemo/blob/main/media/screen1.png?raw=true)
+
  
 ### Pascal / Delphi:
 <img width="1046" height="895" alt="image" src="https://github.com/user-attachments/assets/76b4f7bb-a675-42a9-b2f3-c135ff774e79" />

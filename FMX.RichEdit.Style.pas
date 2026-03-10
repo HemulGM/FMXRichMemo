@@ -1,4 +1,4 @@
-unit FMX.RichEdit.Style;
+﻿unit FMX.RichEdit.Style;
 
 interface
 
@@ -87,6 +87,7 @@ type
     FShowWordHighLight: Boolean;
     FShowLinesBackgroundColor: Boolean;
     FGutterNumberAllLines: Boolean;
+    FGutterFontColor: TAlphaColor;
     procedure DoChangeCaretPos(Sender: TObject; const ACaretPosition: TCaretPosition);
     procedure SetOnChangeCaretPos(const Value: TCaretPositionChanged);
     function GetCanCopy: Boolean;
@@ -114,6 +115,7 @@ type
     procedure SetShowWordHighLight(const Value: Boolean);
     procedure SetShowLinesBackgroundColor(const Value: Boolean);
     procedure SetGutterNumberAllLines(const Value: Boolean);
+    procedure SetGutterFontColor(const Value: TAlphaColor);
   protected
     function CreateEditor: TTextEditor; override;
     procedure FGutterPaint(Sender: TObject; Canvas: TCanvas);
@@ -160,6 +162,7 @@ type
     property SelectedTextColor: TAlphaColor read FSelectedTextColor write SetSelectedTextColor;
     property UseSelectedTextColor: Boolean read FUseSelectedTextColor write SetUseSelectedTextColor;
     property GutterNumberAllLines: Boolean read FGutterNumberAllLines write SetGutterNumberAllLines;
+    property GutterFontColor: TAlphaColor read FGutterFontColor write SetGutterFontColor;
     property OnDrawBefore: TPaintEvent read FOnDrawBefore write SetOnDrawBefore;
     property OnDrawAfter: TPaintEvent read FOnDrawAfter write SetOnDrawAfter;
   end;
@@ -543,26 +546,28 @@ begin
         else if FShowCurrentLine and (i = CaretPosition.Line) then
         begin
           Canvas.Fill.Color := TAlphaColorRec.White;
+          Canvas.Fill.Color := FGutterFontColor;
           Canvas.FillRect(Rect, 0.1);
         end; // Draw custom line background
 
-          Rect.Width := FGutterWidth - 10;
-          Canvas.Fill.Color := TAlphaColorRec.White;
+        Rect.Width := FGutterWidth - 10;
+        Canvas.Fill.Color := FGutterFontColor;
 
-          var NumOpacity := 0.3;
-          if i = CaretPosition.Line then
-            NumOpacity := 0.6;
+        var NumOpacity := 0.3;
+        if i = CaretPosition.Line then
+          NumOpacity := 0.6;
 
         if FGutterNumberAllLines or (i = 0) or ((i + 1) mod 10 = 0) or (i = CaretPosition.Line) then
         begin
           Canvas.FillText(Rect, (i + 1).ToString, False, NumOpacity, [], TTextAlign.Trailing, TTextAlign.Center);
         end
         else
-          Canvas.FillText(Rect, '�', False, NumOpacity, [], TTextAlign.Trailing, TTextAlign.Center);
+          Canvas.FillText(Rect, '·', False, NumOpacity, [], TTextAlign.Trailing, TTextAlign.Center);
       end;
 
     Canvas.Stroke.Kind := TBrushKind.Solid;
     Canvas.Stroke.Color := TAlphaColorRec.White;
+    Canvas.Stroke.Color := FGutterFontColor;
     Canvas.Stroke.Thickness := 1;
     Canvas.DrawLine(
       Canvas.AlignToPixel(TPointF.Create(FGutterWidth - 1, BRect.Top - 5)),
@@ -608,6 +613,7 @@ begin
     FGutterControl.OnPaint := FGutterPaint;
     FGutterControl.Margins.Rect := Content.Margins.Rect;
     FGutterControl.Margins.Right := -12;
+    FGutterControl.Margins.Right := 0;
     Content.Margins.Left := 0;
     RecalcGutter;
   end;
@@ -630,6 +636,8 @@ begin
   FGutterNumberAllLines := True;
   FLinesBackgroundColor := TObjectDictionary<Integer, TBrush>.Create([doOwnsValues]);
   FWordHighlight := TObjectDictionary<TTextRange, TStrokeBrush>.Create([doOwnsValues]);
+  FGutterFontColor := TAlphaColors.Black;
+  RoundedSelection := True;
 end;
 
 function TRichEditStyled.CreateEditor: TTextEditor;
@@ -848,6 +856,11 @@ begin
   Repaint;
 end;
 
+procedure TRichEditStyled.SetGutterFontColor(const Value: TAlphaColor);
+begin
+  FGutterFontColor := Value;
+end;
+
 procedure TRichEditStyled.SetGutterNumberAllLines(const Value: Boolean);
 begin
   FGutterNumberAllLines := Value;
@@ -957,4 +970,3 @@ finalization
   TPresentationProxyFactory.Current.Unregister('RichEditStyled', TStyledPresentationProxy<TRichEditStyled>);
 
 end.
-

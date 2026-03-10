@@ -26,7 +26,7 @@ begin
   inherited;
 
   FStringKey := TKeyWord.Create;
-  FStringKey.Color := $FFE7DB74;
+  FStringKey.Color := $FF8D8647;
   FStringKey.Font.Assign(FDefaultFont);
 
   FFieldKey := TKeyWord.Create;

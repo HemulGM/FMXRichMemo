@@ -607,7 +607,7 @@ begin
     FGutterControl.Width := 0;
     FGutterControl.OnPaint := FGutterPaint;
     FGutterControl.Margins.Rect := Content.Margins.Rect;
-    FGutterControl.Margins.Right := -12;
+    FGutterControl.Margins.Right := 0;
     Content.Margins.Left := 0;
     RecalcGutter;
   end;

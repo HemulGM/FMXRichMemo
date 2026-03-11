@@ -247,7 +247,6 @@ object FormMain: TFormMain
         Size.Width = 705.000000000000000000
         Size.Height = 611.000000000000000000
         Size.PlatformDefault = False
-        StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
         Viewport.Width = 675.000000000000000000
@@ -467,8 +466,8 @@ object FormMain: TFormMain
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 675.000000000000000000
-        Viewport.Height = 587.000000000000000000
+        Viewport.Width = 705.000000000000000000
+        Viewport.Height = 611.000000000000000000
       end
     end
     object TabItemSQL: TTabItem
@@ -539,8 +538,8 @@ object FormMain: TFormMain
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 675.000000000000000000
-        Viewport.Height = 587.000000000000000000
+        Viewport.Width = 705.000000000000000000
+        Viewport.Height = 611.000000000000000000
       end
     end
     object TabItemPython: TTabItem
@@ -599,8 +598,8 @@ object FormMain: TFormMain
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 687.000000000000000000
-        Viewport.Height = 599.000000000000000000
+        Viewport.Width = 705.000000000000000000
+        Viewport.Height = 611.000000000000000000
       end
     end
     object TabItemMD: TTabItem
@@ -916,8 +915,8 @@ object FormMain: TFormMain
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 675.000000000000000000
-        Viewport.Height = 587.000000000000000000
+        Viewport.Width = 705.000000000000000000
+        Viewport.Height = 611.000000000000000000
       end
     end
     object TabItemHTML: TTabItem
@@ -1094,8 +1093,8 @@ object FormMain: TFormMain
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 675.000000000000000000
-        Viewport.Height = 587.000000000000000000
+        Viewport.Width = 705.000000000000000000
+        Viewport.Height = 611.000000000000000000
       end
     end
     object TabItemCSS: TTabItem
@@ -1274,8 +1273,8 @@ object FormMain: TFormMain
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 675.000000000000000000
-        Viewport.Height = 599.000000000000000000
+        Viewport.Width = 705.000000000000000000
+        Viewport.Height = 611.000000000000000000
       end
     end
   end

@@ -87,6 +87,12 @@ type
     FShowWordHighLight: Boolean;
     FShowLinesBackgroundColor: Boolean;
     FGutterNumberAllLines: Boolean;
+    FGutterFont: TFont;
+    FGutterRightTextMargin: Single;
+    FGutterRightMargin: Single;
+    FGutterLeftTextMargin: Single;
+    FGutterLineColor: TAlphaColor;
+    FOnGutterDraw: TPaintEvent;
     procedure DoChangeCaretPos(Sender: TObject; const ACaretPosition: TCaretPosition);
     procedure SetOnChangeCaretPos(const Value: TCaretPositionChanged);
     function GetCanCopy: Boolean;
@@ -114,6 +120,12 @@ type
     procedure SetShowWordHighLight(const Value: Boolean);
     procedure SetShowLinesBackgroundColor(const Value: Boolean);
     procedure SetGutterNumberAllLines(const Value: Boolean);
+    procedure SetGutterFont(const Value: TFont);
+    procedure SetGutterLeftTextMargin(const Value: Single);
+    procedure SetGutterRightMargin(const Value: Single);
+    procedure SetGutterRightTextMargin(const Value: Single);
+    procedure SetGutterLineColor(const Value: TAlphaColor);
+    procedure SetOnGutterDraw(const Value: TPaintEvent);
   protected
     function CreateEditor: TTextEditor; override;
     procedure FGutterPaint(Sender: TObject; Canvas: TCanvas);
@@ -156,12 +168,18 @@ type
     property ShowWordHighLight: Boolean read FShowWordHighLight write SetShowWordHighLight;
     property ErrorLine: Int64 read FErrorLine write SetErrorLine;
     property LineSpacing: Single read FLineSpacing write SetLineSpacing;
+    property GutterFont: TFont read FGutterFont write SetGutterFont;
     property RoundedSelection: Boolean read FRoundedSelection write SetRoundedSelection;
     property SelectedTextColor: TAlphaColor read FSelectedTextColor write SetSelectedTextColor;
     property UseSelectedTextColor: Boolean read FUseSelectedTextColor write SetUseSelectedTextColor;
     property GutterNumberAllLines: Boolean read FGutterNumberAllLines write SetGutterNumberAllLines;
+    property GutterLineColor: TAlphaColor read FGutterLineColor write SetGutterLineColor;
+    property GutterRightTextMargin: Single read FGutterRightTextMargin write SetGutterRightTextMargin;
+    property GutterRightMargin: Single read FGutterRightMargin write SetGutterRightMargin;
+    property GutterLeftTextMargin: Single read FGutterLeftTextMargin write SetGutterLeftTextMargin;
     property OnDrawBefore: TPaintEvent read FOnDrawBefore write SetOnDrawBefore;
     property OnDrawAfter: TPaintEvent read FOnDrawAfter write SetOnDrawAfter;
+    property OnGutterDraw: TPaintEvent read FOnGutterDraw write SetOnGutterDraw;
   end;
 
 implementation
@@ -517,7 +535,8 @@ begin
     Exit;
   Canvas.BeginScene;
   try
-    Canvas.Font.Assign(Memo.TextSettings.Font);
+    Canvas.Font.Assign(FGutterFont);
+
     // Line number
     var BRect := Content.BoundsRect;
     for var I := Max(0, Editor.LinesLayout.FirstVisibleLineIndex) to Min(Editor.LinesLayout.LastVisibleLineIndex, Editor.LinesLayout.Count - 1) do
@@ -546,12 +565,12 @@ begin
           Canvas.FillRect(Rect, 0.1);
         end; // Draw custom line background
 
-          Rect.Width := FGutterWidth - 10;
-          Canvas.Fill.Color := TAlphaColorRec.White;
+        Rect.Width := FGutterWidth - FGutterRightTextMargin;
+        Canvas.Fill.Color := TAlphaColorRec.White;
 
-          var NumOpacity := 0.3;
-          if i = CaretPosition.Line then
-            NumOpacity := 0.6;
+        var NumOpacity := 0.3;
+        if i = CaretPosition.Line then
+          NumOpacity := 1;
 
         if FGutterNumberAllLines or (i = 0) or ((i + 1) mod 10 = 0) or (i = CaretPosition.Line) then
         begin
@@ -562,11 +581,18 @@ begin
       end;
 
     Canvas.Stroke.Kind := TBrushKind.Solid;
-    Canvas.Stroke.Color := TAlphaColorRec.White;
-    Canvas.Stroke.Thickness := 1;
+    if FGutterLineColor = TAlphaColors.Null then
+      Canvas.Stroke.Color := TAlphaColors.Dimgray
+    else
+      Canvas.Stroke.Color := FGutterLineColor;
+    Canvas.Stroke.Thickness := 2;
     Canvas.DrawLine(
-      Canvas.AlignToPixel(TPointF.Create(FGutterWidth - 1, BRect.Top - 5)),
-      Canvas.AlignToPixel(TPointF.Create(FGutterWidth - 1, BRect.Bottom + 5)), 0.3);
+      Canvas.AlignToPixel(TPointF.Create(FGutterWidth - 1, BRect.Top - FGutterControl.Margins.Top)),
+      Canvas.AlignToPixel(TPointF.Create(FGutterWidth - 1, BRect.Bottom + FGutterControl.Margins.Bottom)), 1);
+
+    // Custom draw gutter
+    if Assigned(FOnGutterDraw) then
+      FOnGutterDraw(FGutterControl, Canvas);
   finally
     Canvas.EndScene;
   end;
@@ -606,9 +632,9 @@ begin
     FGutterControl.Align := TAlignLayout.MostLeft;
     FGutterControl.Width := 0;
     FGutterControl.OnPaint := FGutterPaint;
+    FGutterControl.HitTest := False;
     FGutterControl.Margins.Rect := Content.Margins.Rect;
-    FGutterControl.Margins.Right := 0;
-    Content.Margins.Left := 0;
+    FGutterControl.Margins.Right := -Content.Margins.Left + FGutterRightMargin;
     RecalcGutter;
   end;
 end;
@@ -626,7 +652,13 @@ constructor TRichEditStyled.Create(AOwner: TComponent);
 begin
   inherited;
   DisableDisappear := True;
+  FGutterFont := TFont.Create;
+  FGutterFont.Assign(Memo.Font);
   FLineSpacing := 1;
+  FGutterRightTextMargin := 4;
+  FGutterLeftTextMargin := 10;
+  FGutterRightMargin := 0;
+  FGutterLineColor := TAlphaColors.Null;
   FGutterNumberAllLines := True;
   FLinesBackgroundColor := TObjectDictionary<Integer, TBrush>.Create([doOwnsValues]);
   FWordHighlight := TObjectDictionary<TTextRange, TStrokeBrush>.Create([doOwnsValues]);
@@ -642,6 +674,7 @@ destructor TRichEditStyled.Destroy;
 begin
   FLinesBackgroundColor.Free;
   FWordHighlight.Free;
+  FGutterFont.Free;
   inherited;
 end;
 
@@ -684,9 +717,12 @@ procedure TRichEditStyled.RecalcGutter;
 begin
   if not Assigned(Memo.Canvas) then
     Exit;
+  if not Assigned(FGutterControl) then
+    Exit;
   if FShowGutter then
   begin
-    var W := Ceil(Memo.Canvas.TextWidth(Memo.Lines.Count.ToString) + 20);
+    FGutterControl.Canvas.Font.Assign(FGutterFont);
+    var W := Ceil(FGutterControl.Canvas.TextWidth(Memo.Lines.Count.ToString) + FGutterRightTextMargin + FGutterLeftTextMargin);
     if FGutterWidth <> W then
       FGutterWidth := W;
   end
@@ -695,8 +731,7 @@ begin
     if FGutterWidth <> 0 then
       FGutterWidth := 0;
   end;
-  if Assigned(FGutterControl) then
-    FGutterControl.Width := FGutterWidth;
+  FGutterControl.Width := FGutterWidth;
 end;
 
 procedure TRichEditStyled.DoViewportPositionChange(const OldViewportPosition, NewViewportPosition: TPointF; const ContentSizeChanged: Boolean);
@@ -848,9 +883,50 @@ begin
   Repaint;
 end;
 
+procedure TRichEditStyled.SetGutterFont(const Value: TFont);
+begin
+  FGutterFont.Assign(Value);
+  RecalcGutter;
+  Repaint;
+end;
+
+procedure TRichEditStyled.SetGutterLeftTextMargin(const Value: Single);
+begin
+  FGutterLeftTextMargin := Value;
+  RecalcGutter;
+  RecalcSize;
+  Repaint;
+end;
+
+procedure TRichEditStyled.SetGutterLineColor(const Value: TAlphaColor);
+begin
+  FGutterLineColor := Value;
+  Repaint;
+end;
+
 procedure TRichEditStyled.SetGutterNumberAllLines(const Value: Boolean);
 begin
   FGutterNumberAllLines := Value;
+  Repaint;
+end;
+
+procedure TRichEditStyled.SetGutterRightMargin(const Value: Single);
+begin
+  FGutterRightMargin := Value;
+  var Content: TLayout;
+  if Assigned(FGutterControl) and FindStyleResource<TLayout>('content', Content) then
+  begin
+    FGutterControl.Margins.Right := -Content.Margins.Left + FGutterRightMargin;
+  end;
+  RecalcSize;
+  Repaint;
+end;
+
+procedure TRichEditStyled.SetGutterRightTextMargin(const Value: Single);
+begin
+  FGutterRightTextMargin := Value;
+  RecalcGutter;
+  RecalcSize;
   Repaint;
 end;
 
@@ -875,6 +951,11 @@ end;
 procedure TRichEditStyled.SetOnDrawBefore(const Value: TPaintEvent);
 begin
   FOnDrawBefore := Value;
+end;
+
+procedure TRichEditStyled.SetOnGutterDraw(const Value: TPaintEvent);
+begin
+  FOnGutterDraw := Value;
 end;
 
 procedure TRichEditStyled.SetRoundedSelection(const Value: Boolean);

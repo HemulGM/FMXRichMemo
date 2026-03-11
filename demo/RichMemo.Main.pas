@@ -43,6 +43,12 @@ type
     CheckBoxDrawAfter: TCheckBox;
     CheckBoxLineBG: TCheckBox;
     CheckBoxGutterNumberAllLines: TCheckBox;
+    SpinBoxGLTM: TSpinBox;
+    Label3: TLabel;
+    SpinBoxGRTM: TSpinBox;
+    Label4: TLabel;
+    SpinBoxGRM: TSpinBox;
+    Label5: TLabel;
     procedure CheckBoxCurrentLineChange(Sender: TObject);
     procedure CheckBoxErrorLineChange(Sender: TObject);
     procedure CheckBoxGutterChange(Sender: TObject);
@@ -56,6 +62,9 @@ type
     procedure CheckBoxDrawBeforeChange(Sender: TObject);
     procedure CheckBoxLineBGChange(Sender: TObject);
     procedure CheckBoxGutterNumberAllLinesChange(Sender: TObject);
+    procedure SpinBoxGLTMChangeTracking(Sender: TObject);
+    procedure SpinBoxGRTMChangeTracking(Sender: TObject);
+    procedure SpinBoxGRMChangeTracking(Sender: TObject);
   private
     procedure FOnMemoDrawAfter(Sender: TObject; ACanvas: TCanvas);
     procedure FOnMemoDrawBefore(Sender: TObject; ACanvas: TCanvas);
@@ -325,6 +334,39 @@ begin
         Stroke
       );
   end;
+end;
+
+procedure TFormMain.SpinBoxGLTMChangeTracking(Sender: TObject);
+begin
+  TRichEditStyled(MemoPascal.Presentation).GutterLeftTextMargin := SpinBoxGLTM.Value;
+  TRichEditStyled(MemoJSON.Presentation).GutterLeftTextMargin := SpinBoxGLTM.Value;
+  TRichEditStyled(MemoSQL.Presentation).GutterLeftTextMargin := SpinBoxGLTM.Value;
+  TRichEditStyled(MemoMD.Presentation).GutterLeftTextMargin := SpinBoxGLTM.Value;
+  TRichEditStyled(MemoPython.Presentation).GutterLeftTextMargin := SpinBoxGLTM.Value;
+  TRichEditStyled(MemoHTML.Presentation).GutterLeftTextMargin := SpinBoxGLTM.Value;
+  TRichEditStyled(MemoCSS.Presentation).GutterLeftTextMargin := SpinBoxGLTM.Value;
+end;
+
+procedure TFormMain.SpinBoxGRMChangeTracking(Sender: TObject);
+begin
+  TRichEditStyled(MemoPascal.Presentation).GutterRightMargin := SpinBoxGRM.Value;
+  TRichEditStyled(MemoJSON.Presentation).GutterRightMargin := SpinBoxGRM.Value;
+  TRichEditStyled(MemoSQL.Presentation).GutterRightMargin := SpinBoxGRM.Value;
+  TRichEditStyled(MemoMD.Presentation).GutterRightMargin := SpinBoxGRM.Value;
+  TRichEditStyled(MemoPython.Presentation).GutterRightMargin := SpinBoxGRM.Value;
+  TRichEditStyled(MemoHTML.Presentation).GutterRightMargin := SpinBoxGRM.Value;
+  TRichEditStyled(MemoCSS.Presentation).GutterRightMargin := SpinBoxGRM.Value;
+end;
+
+procedure TFormMain.SpinBoxGRTMChangeTracking(Sender: TObject);
+begin
+  TRichEditStyled(MemoPascal.Presentation).GutterRightTextMargin := SpinBoxGRTM.Value;
+  TRichEditStyled(MemoJSON.Presentation).GutterRightTextMargin := SpinBoxGRTM.Value;
+  TRichEditStyled(MemoSQL.Presentation).GutterRightTextMargin := SpinBoxGRTM.Value;
+  TRichEditStyled(MemoMD.Presentation).GutterRightTextMargin := SpinBoxGRTM.Value;
+  TRichEditStyled(MemoPython.Presentation).GutterRightTextMargin := SpinBoxGRTM.Value;
+  TRichEditStyled(MemoHTML.Presentation).GutterRightTextMargin := SpinBoxGRTM.Value;
+  TRichEditStyled(MemoCSS.Presentation).GutterRightTextMargin := SpinBoxGRTM.Value;
 end;
 
 procedure TFormMain.SpinBoxLineSpacingChange(Sender: TObject);

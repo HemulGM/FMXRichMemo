@@ -466,8 +466,8 @@ object FormMain: TFormMain
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 705.000000000000000000
-        Viewport.Height = 611.000000000000000000
+        Viewport.Width = 675.000000000000000000
+        Viewport.Height = 587.000000000000000000
       end
     end
     object TabItemSQL: TTabItem
@@ -538,8 +538,8 @@ object FormMain: TFormMain
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 705.000000000000000000
-        Viewport.Height = 611.000000000000000000
+        Viewport.Width = 675.000000000000000000
+        Viewport.Height = 587.000000000000000000
       end
     end
     object TabItemPython: TTabItem
@@ -598,8 +598,8 @@ object FormMain: TFormMain
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 705.000000000000000000
-        Viewport.Height = 611.000000000000000000
+        Viewport.Width = 687.000000000000000000
+        Viewport.Height = 599.000000000000000000
       end
     end
     object TabItemMD: TTabItem
@@ -915,8 +915,8 @@ object FormMain: TFormMain
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 705.000000000000000000
-        Viewport.Height = 611.000000000000000000
+        Viewport.Width = 675.000000000000000000
+        Viewport.Height = 587.000000000000000000
       end
     end
     object TabItemHTML: TTabItem
@@ -1093,8 +1093,8 @@ object FormMain: TFormMain
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 705.000000000000000000
-        Viewport.Height = 611.000000000000000000
+        Viewport.Width = 675.000000000000000000
+        Viewport.Height = 587.000000000000000000
       end
     end
     object TabItemCSS: TTabItem
@@ -1273,8 +1273,8 @@ object FormMain: TFormMain
         StyleLookup = 'memostyle_clear'
         TabOrder = 0
         OnPresentationNameChoosing = MemoPascalPresentationNameChoosing
-        Viewport.Width = 705.000000000000000000
-        Viewport.Height = 611.000000000000000000
+        Viewport.Width = 675.000000000000000000
+        Viewport.Height = 599.000000000000000000
       end
     end
   end
@@ -39125,7 +39125,7 @@ object FormMain: TFormMain
     object SpinBoxLineSpacing: TSpinBox
       Touch.InteractiveGestures = [LongTap, DoubleTap]
       Align = Top
-      TabOrder = 11
+      TabOrder = 14
       Cursor = crIBeam
       Min = 1.000000000000000000
       Max = 10.000000000000000000
@@ -39136,6 +39136,7 @@ object FormMain: TFormMain
       Position.X = 130.000000000000000000
       Position.Y = 482.000000000000000000
       Margins.Left = 120.000000000000000000
+      Margins.Bottom = 10.000000000000000000
       Size.Width = 110.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
@@ -39257,6 +39258,83 @@ object FormMain: TFormMain
       TabOrder = 8
       Text = 'Gutter number all lines'
       OnChange = CheckBoxGutterNumberAllLinesChange
+    end
+    object SpinBoxGLTM: TSpinBox
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      Align = Top
+      TabOrder = 13
+      Cursor = crIBeam
+      Max = 999999.000000000000000000
+      Value = 10.000000000000000000
+      Position.X = 130.000000000000000000
+      Position.Y = 524.000000000000000000
+      Margins.Left = 120.000000000000000000
+      Margins.Bottom = 10.000000000000000000
+      Size.Width = 110.000000000000000000
+      Size.Height = 32.000000000000000000
+      Size.PlatformDefault = False
+      OnChangeTracking = SpinBoxGLTMChangeTracking
+      object Label3: TLabel
+        Align = Left
+        Margins.Left = -120.000000000000000000
+        Position.X = -120.000000000000000000
+        Size.Width = 120.000000000000000000
+        Size.Height = 32.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Gutter left text margins'
+        TabOrder = 0
+      end
+    end
+    object SpinBoxGRTM: TSpinBox
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      Align = Top
+      TabOrder = 12
+      Cursor = crIBeam
+      Max = 999999.000000000000000000
+      Value = 4.000000000000000000
+      Position.X = 130.000000000000000000
+      Position.Y = 566.000000000000000000
+      Margins.Left = 120.000000000000000000
+      Margins.Bottom = 10.000000000000000000
+      Size.Width = 110.000000000000000000
+      Size.Height = 32.000000000000000000
+      Size.PlatformDefault = False
+      OnChangeTracking = SpinBoxGRTMChangeTracking
+      object Label4: TLabel
+        Align = Left
+        Margins.Left = -120.000000000000000000
+        Position.X = -120.000000000000000000
+        Size.Width = 120.000000000000000000
+        Size.Height = 32.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Gutter right text margins'
+        TabOrder = 0
+      end
+    end
+    object SpinBoxGRM: TSpinBox
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      Align = Top
+      TabOrder = 11
+      Cursor = crIBeam
+      Max = 999999.000000000000000000
+      Position.X = 130.000000000000000000
+      Position.Y = 608.000000000000000000
+      Margins.Left = 120.000000000000000000
+      Margins.Bottom = 10.000000000000000000
+      Size.Width = 110.000000000000000000
+      Size.Height = 32.000000000000000000
+      Size.PlatformDefault = False
+      OnChangeTracking = SpinBoxGRMChangeTracking
+      object Label5: TLabel
+        Align = Left
+        Margins.Left = -120.000000000000000000
+        Position.X = -120.000000000000000000
+        Size.Width = 120.000000000000000000
+        Size.Height = 32.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Gutter right margins'
+        TabOrder = 0
+      end
     end
   end
   object StyleBook1: TStyleBook

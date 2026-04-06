@@ -569,7 +569,7 @@ begin
         Canvas.Fill.Color := TAlphaColorRec.White;
 
         var NumOpacity := 0.3;
-        if i = CaretPosition.Line then
+        if (i = CaretPosition.Line) and FShowCurrentLine then
           NumOpacity := 1;
 
         if FGutterNumberAllLines or (i = 0) or ((i + 1) mod 10 = 0) or (i = CaretPosition.Line) then

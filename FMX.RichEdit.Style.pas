@@ -38,8 +38,12 @@ type
     FUseSelectedTextColor: Boolean;
     FCodeSyntax: TCodeSyntax;
     FLineSpacing: Single;
+    FSameFontFamily: Boolean;
+    FSameFontSize: Boolean;
     procedure SetLineSpacing(const Value: Single);
     procedure UpdateLayout;
+    procedure SetSameFontFamily(const Value: Boolean);
+    procedure SetSameFontSize(const Value: Boolean);
   protected
     procedure UpdateLayoutParams(const ALineIndex: Integer; const ALayout: TTextLayout); override;
     procedure InvalidateLinesLayouts;
@@ -55,6 +59,8 @@ type
     property LineSpacing: Single read FLineSpacing write SetLineSpacing;
     procedure SetSelectedTextColor(const Color: TAlphaColor);
     procedure SetUseSelectedTextColor(const Value: Boolean);
+    property SameFontFamily: Boolean read FSameFontFamily write SetSameFontFamily;
+    property SameFontSize: Boolean read FSameFontSize write SetSameFontSize;
   end;
 
   TRichEditTextEditor = class(TTextEditor)
@@ -150,6 +156,10 @@ type
     procedure SetColorCurrentLine(const Value: TAlphaColor);
     procedure SetColorLineNumberActive(const Value: TAlphaColor);
     procedure SetColorLineNumberNormal(const Value: TAlphaColor);
+    procedure SetSyntaxSameFontFamily(const Value: Boolean);
+    procedure SetSyntaxSameFontSize(const Value: Boolean);
+    function GetSyntaxSameFontFamily: Boolean;
+    function GetSyntaxSameFontSize: Boolean;
   protected
     function CreateEditor: TTextEditor; override;
     procedure DoGutterAllowMouse(Button: TMouseButton; Shift: TShiftState; X, Y: Single; var Handled: Boolean);
@@ -175,9 +185,12 @@ type
     procedure ApplyStyle; override;
     procedure FreeStyle; override;
   public
-    // Features
-    procedure SetCodeSyntaxName(const Lang: string; const DefFont: TFont; DefColor: TAlphaColor);
+    // Helpers
     function GetTextRegion(const Range: TTextRange): TRegion;
+    // Code syntax
+    procedure SetCodeSyntaxName(const Lang: string; const DefFont: TFont; DefColor: TAlphaColor);
+    property SyntaxSameFontFamily: Boolean read GetSyntaxSameFontFamily write SetSyntaxSameFontFamily;
+    property SyntaxSameFontSize: Boolean read GetSyntaxSameFontSize write SetSyntaxSameFontSize;
     // Memo text state
     property CanUndo: Boolean read GetCanUndo;
     property CanRedo: Boolean read GetCanRedo;
@@ -398,6 +411,8 @@ end;
 constructor TRichEditLinesLayout.Create(const ALineSource: ITextLinesSource; const AScrollableContent: IScrollableContent);
 begin
   FLineSpacing := 1;
+  FSameFontFamily := True;
+  FSameFontSize := False;
   FSelectedRange := TDictionary<Integer, TTextRange>.Create;
   FSelectedColor := TAlphaColorRec.White;
   inherited;
@@ -452,6 +467,16 @@ begin
   UpdateLayout;
 end;
 
+procedure TRichEditLinesLayout.SetSameFontFamily(const Value: Boolean);
+begin
+  FSameFontFamily := Value;
+end;
+
+procedure TRichEditLinesLayout.SetSameFontSize(const Value: Boolean);
+begin
+  FSameFontSize := Value;
+end;
+
 procedure TRichEditLinesLayout.SetSelectedTextColor(const Color: TAlphaColor);
 begin
   FSelectedColor := Color;
@@ -479,7 +504,10 @@ begin
     ALayout.ClearAttributes;
     for var Attr in FCodeSyntax.GetAttributesForLine(LinesSource[ALineIndex], ALineIndex) do
     begin
-      Attr.Attribute.Font.Family := TextSettings.Font.Family;
+      if FSameFontFamily then
+        Attr.Attribute.Font.Family := TextSettings.Font.Family;
+      if FSameFontSize then
+        Attr.Attribute.Font.Size := TextSettings.Font.Size;
       ALayout.AddAttribute(Attr.Range, Attr.Attribute);
     end;
     var P := (FLineSpacing - 1) * GetLineHeight(ALineIndex) / 2;
@@ -867,6 +895,16 @@ begin
   Result := not Model.ReadOnly and UndoManager.CanUndo;
 end;
 
+function TRichEditStyled.GetSyntaxSameFontFamily: Boolean;
+begin
+  Result := TRichEditLinesLayout(Editor.LinesLayout).SameFontFamily;
+end;
+
+function TRichEditStyled.GetSyntaxSameFontSize: Boolean;
+begin
+  Result := TRichEditLinesLayout(Editor.LinesLayout).SameFontSize;
+end;
+
 function TRichEditStyled.GetTextRegion(const Range: TTextRange): TRegion;
 begin
   var LCaret := Editor.Lines.TextPosToPos(Range.Pos);
@@ -1094,6 +1132,16 @@ procedure TRichEditStyled.SetShowWordHighLight(const Value: Boolean);
 begin
   FShowWordHighLight := Value;
   Repaint;
+end;
+
+procedure TRichEditStyled.SetSyntaxSameFontFamily(const Value: Boolean);
+begin
+  TRichEditLinesLayout(Editor.LinesLayout).SameFontFamily := Value;
+end;
+
+procedure TRichEditStyled.SetSyntaxSameFontSize(const Value: Boolean);
+begin
+  TRichEditLinesLayout(Editor.LinesLayout).SameFontSize := Value;
 end;
 
 procedure TRichEditStyled.SetUseSelectedTextColor(const Value: Boolean);

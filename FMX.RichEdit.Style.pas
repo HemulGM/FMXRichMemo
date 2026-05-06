@@ -10,8 +10,21 @@ uses
   System.Types, FMX.Types, FMX.Memo, System.Generics.Collections;
 
 type
+  TNotifyAllowMouse = procedure(Button: TMouseButton; Shift: TShiftState; X, Y: Single; var Handled: Boolean) of object;
+
+  TRichEditStyled = class;
+
   TMemoGutter = class(TPaintBox)
+  private
+    FMemo: TRichEditStyled;
+    FOnAllowMouse: TNotifyAllowMouse;
+    procedure SetOnAllowMouse(const Value: TNotifyAllowMouse);
+  protected
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
   public
+    property OnAllowMouse: TNotifyAllowMouse read FOnAllowMouse write SetOnAllowMouse;
     destructor Destroy; override;
   end;
 
@@ -77,7 +90,7 @@ type
     FShowGutter: Boolean;
     FShowCurrentLine: Boolean;
     FLineSpacing: Single;
-    FGutterControl: TPaintBox;
+    FGutterControl: TMemoGutter;
     FRoundedSelection: Boolean;
     FSelectedTextColor: TAlphaColor;
     FUseSelectedTextColor: Boolean;
@@ -93,6 +106,12 @@ type
     FGutterLeftTextMargin: Single;
     FGutterLineColor: TAlphaColor;
     FOnGutterDraw: TPaintEvent;
+    FContentMargins: TRectF;
+    FOnGutterAllowMouse: TNotifyAllowMouse;
+    FColorLineError: TAlphaColor;
+    FColorCurrentLine: TAlphaColor;
+    FColorLineNumberNormal: TAlphaColor;
+    FColorLineNumberActive: TAlphaColor;
     procedure DoChangeCaretPos(Sender: TObject; const ACaretPosition: TCaretPosition);
     procedure SetOnChangeCaretPos(const Value: TCaretPositionChanged);
     function GetCanCopy: Boolean;
@@ -126,9 +145,15 @@ type
     procedure SetGutterRightTextMargin(const Value: Single);
     procedure SetGutterLineColor(const Value: TAlphaColor);
     procedure SetOnGutterDraw(const Value: TPaintEvent);
+    procedure SetOnGutterAllowMouse(const Value: TNotifyAllowMouse);
+    procedure SetColorLineError(const Value: TAlphaColor);
+    procedure SetColorCurrentLine(const Value: TAlphaColor);
+    procedure SetColorLineNumberActive(const Value: TAlphaColor);
+    procedure SetColorLineNumberNormal(const Value: TAlphaColor);
   protected
     function CreateEditor: TTextEditor; override;
-    procedure FGutterPaint(Sender: TObject; Canvas: TCanvas);
+    procedure DoGutterAllowMouse(Button: TMouseButton; Shift: TShiftState; X, Y: Single; var Handled: Boolean);
+    procedure FGutterPaint(Sender: TObject; ACanvas: TCanvas);
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
     procedure DragEnd; override;
@@ -144,17 +169,16 @@ type
     procedure DoExit; override;
     procedure UpdateVisibleLayoutParams;
   public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     procedure Paint; override;
     procedure ApplyStyle; override;
     procedure FreeStyle; override;
-    function GetTextRegion(const Range: TTextRange): TRegion;
+  public
+    // Features
     procedure SetCodeSyntaxName(const Lang: string; const DefFont: TFont; DefColor: TAlphaColor);
-    constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
-    property LinesBackgroundColor: TObjectDictionary<Integer, TBrush> read FLinesBackgroundColor;
-    property ShowLinesBackgroundColor: Boolean read FShowLinesBackgroundColor write SetShowLinesBackgroundColor;
-    property WordHighlight: TObjectDictionary<TTextRange, TStrokeBrush> read FWordHighlight;
-    property OnChangeCaretPos: TCaretPositionChanged read FOnChangeCaretPos write SetOnChangeCaretPos;
+    function GetTextRegion(const Range: TTextRange): TRegion;
+    // Memo text state
     property CanUndo: Boolean read GetCanUndo;
     property CanRedo: Boolean read GetCanRedo;
     property CanCut: Boolean read GetCanCut;
@@ -162,24 +186,42 @@ type
     property CanPaste: Boolean read GetCanPaste;
     property CanDelete: Boolean read GetCanDelete;
     property CanSelectAll: Boolean read GetCanSelectAll;
-    property ShowGutter: Boolean read FShowGutter write SetShowGutter;
+    // Error line
     property ShowError: Boolean read FShowError write SetShowError;
-    property ShowCurrentLine: Boolean read FShowCurrentLine write SetShowCurrentLine;
-    property ShowWordHighLight: Boolean read FShowWordHighLight write SetShowWordHighLight;
     property ErrorLine: Int64 read FErrorLine write SetErrorLine;
+    // Lines background color
+    property ShowLinesBackgroundColor: Boolean read FShowLinesBackgroundColor write SetShowLinesBackgroundColor;
+    property LinesBackgroundColor: TObjectDictionary<Integer, TBrush> read FLinesBackgroundColor;
+    // Word Highlight
+    property ShowWordHighLight: Boolean read FShowWordHighLight write SetShowWordHighLight;
+    property WordHighlight: TObjectDictionary<TTextRange, TStrokeBrush> read FWordHighlight;
+    // Current line
+    property ShowCurrentLine: Boolean read FShowCurrentLine write SetShowCurrentLine;
+    property ColorCurrentLine: TAlphaColor read FColorCurrentLine write SetColorCurrentLine;
+    // Line spacing
     property LineSpacing: Single read FLineSpacing write SetLineSpacing;
-    property GutterFont: TFont read FGutterFont write SetGutterFont;
-    property RoundedSelection: Boolean read FRoundedSelection write SetRoundedSelection;
-    property SelectedTextColor: TAlphaColor read FSelectedTextColor write SetSelectedTextColor;
+    // Selected text
     property UseSelectedTextColor: Boolean read FUseSelectedTextColor write SetUseSelectedTextColor;
+    property ColorSelectedText: TAlphaColor read FSelectedTextColor write SetSelectedTextColor;
+    property RoundedSelection: Boolean read FRoundedSelection write SetRoundedSelection;
+    // Colors
+    property ColorGutterLine: TAlphaColor read FGutterLineColor write SetGutterLineColor;
+    property ColorLineError: TAlphaColor read FColorLineError write SetColorLineError;
+    property ColorLineNumberNormal: TAlphaColor read FColorLineNumberNormal write SetColorLineNumberNormal;
+    property ColorLineNumberActive: TAlphaColor read FColorLineNumberActive write SetColorLineNumberActive;
+    // Gutter
+    property ShowGutter: Boolean read FShowGutter write SetShowGutter;
+    property GutterFont: TFont read FGutterFont write SetGutterFont;
     property GutterNumberAllLines: Boolean read FGutterNumberAllLines write SetGutterNumberAllLines;
-    property GutterLineColor: TAlphaColor read FGutterLineColor write SetGutterLineColor;
     property GutterRightTextMargin: Single read FGutterRightTextMargin write SetGutterRightTextMargin;
     property GutterRightMargin: Single read FGutterRightMargin write SetGutterRightMargin;
     property GutterLeftTextMargin: Single read FGutterLeftTextMargin write SetGutterLeftTextMargin;
+    // Events
+    property OnChangeCaretPos: TCaretPositionChanged read FOnChangeCaretPos write SetOnChangeCaretPos;
     property OnDrawBefore: TPaintEvent read FOnDrawBefore write SetOnDrawBefore;
     property OnDrawAfter: TPaintEvent read FOnDrawAfter write SetOnDrawAfter;
     property OnGutterDraw: TPaintEvent read FOnGutterDraw write SetOnGutterDraw;
+    property OnGutterAllowMouse: TNotifyAllowMouse read FOnGutterAllowMouse write SetOnGutterAllowMouse;
   end;
 
 implementation
@@ -490,13 +532,13 @@ begin
         // Draw error line
         if FShowError and (i = FErrorLine - 1) then
         begin
-          ACanvas.Fill.Color := TAlphaColorRec.Red;
-          ACanvas.FillRect(Rect, 0.1);
+          ACanvas.Fill.Color := FColorLineError;
+          ACanvas.FillRect(Rect, 1);
         end // Draw current line
         else if FShowCurrentLine and (i = CaretPosition.Line) then
         begin
-          ACanvas.Fill.Color := TAlphaColorRec.White;
-          ACanvas.FillRect(Rect, 0.1);
+          ACanvas.Fill.Color := FColorCurrentLine;
+          ACanvas.FillRect(Rect, 1);
         end; // Draw custom line background
         if FShowLinesBackgroundColor and FLinesBackgroundColor.ContainsKey(i) then
         begin
@@ -529,16 +571,15 @@ begin
   end;
 end;
 
-procedure TRichEditStyled.FGutterPaint(Sender: TObject; Canvas: TCanvas);
+procedure TRichEditStyled.FGutterPaint(Sender: TObject; ACanvas: TCanvas);
 begin
   if FGutterControl.Width <= 0 then
     Exit;
-  Canvas.BeginScene;
+  ACanvas.BeginScene;
   try
-    Canvas.Font.Assign(FGutterFont);
+    ACanvas.Font.Assign(FGutterFont);
 
-    // Line number
-    var BRect := Content.BoundsRect;
+    // Lines
     for var I := Max(0, Editor.LinesLayout.FirstVisibleLineIndex) to Min(Editor.LinesLayout.LastVisibleLineIndex, Editor.LinesLayout.Count - 1) do
       if not Editor.LinesLayout[I].IsInvalidPosition then
       begin
@@ -548,53 +589,58 @@ begin
         Rect.Left := 0;
         Rect.Width := FGutterWidth;
         Rect.NormalizeRect;
-        if (Rect.Top < 0) and (Rect.Bottom < 0) then
+
+        if Rect.Bottom < 0 then
           Continue;
-        if (Rect.Top > BRect.Height) and (Rect.Bottom > BRect.Height) then
+        if Rect.Top > FGutterControl.Height then
           Continue;
 
         // Draw error line
         if FShowError and (i = FErrorLine - 1) then
         begin
-          Canvas.Fill.Color := TAlphaColorRec.Red;
-          Canvas.FillRect(Rect, 0.1);
+          ACanvas.Fill.Color := FColorLineError;
+          ACanvas.FillRect(Rect, 1);
         end // Draw current line
         else if FShowCurrentLine and (i = CaretPosition.Line) then
         begin
-          Canvas.Fill.Color := TAlphaColorRec.White;
-          Canvas.FillRect(Rect, 0.1);
+          ACanvas.Fill.Color := FColorCurrentLine;
+          ACanvas.FillRect(Rect, 1);
         end; // Draw custom line background
 
-        Rect.Width := FGutterWidth - FGutterRightTextMargin;
-        Canvas.Fill.Color := TAlphaColorRec.White;
+        // Line numbers
+        Rect.Width := FGutterWidth - FGutterRightTextMargin - FGutterRightMargin;
 
-        var NumOpacity := 0.3;
         if i = CaretPosition.Line then
-          NumOpacity := 1;
+          ACanvas.Fill.Color := FColorLineNumberActive
+        else
+          ACanvas.Fill.Color := FColorLineNumberNormal;
 
         if FGutterNumberAllLines or (i = 0) or ((i + 1) mod 10 = 0) or (i = CaretPosition.Line) then
         begin
-          Canvas.FillText(Rect, (i + 1).ToString, False, NumOpacity, [], TTextAlign.Trailing, TTextAlign.Center);
+          ACanvas.FillText(Rect, (i + 1).ToString, False, 1, [], TTextAlign.Trailing, TTextAlign.Center);
         end
         else
-          Canvas.FillText(Rect, '·', False, NumOpacity, [], TTextAlign.Trailing, TTextAlign.Center);
+          ACanvas.FillText(Rect, '·', False, 1, [], TTextAlign.Trailing, TTextAlign.Center);
       end;
 
-    Canvas.Stroke.Kind := TBrushKind.Solid;
-    if FGutterLineColor = TAlphaColors.Null then
-      Canvas.Stroke.Color := TAlphaColors.Dimgray
-    else
-      Canvas.Stroke.Color := FGutterLineColor;
-    Canvas.Stroke.Thickness := 2;
-    Canvas.DrawLine(
-      Canvas.AlignToPixel(TPointF.Create(FGutterWidth - 1, BRect.Top - FGutterControl.Margins.Top)),
-      Canvas.AlignToPixel(TPointF.Create(FGutterWidth - 1, BRect.Bottom + FGutterControl.Margins.Bottom)), 1);
+    ACanvas.Stroke.Kind := TBrushKind.Solid;
+    ACanvas.Stroke.Color := FGutterLineColor;
+    ACanvas.Stroke.Thickness := 1;
+    // Fix line Thickness (use FillRect)
+    ACanvas.Fill.Kind := TBrushKind.Solid;
+    ACanvas.Fill.Color := ACanvas.Stroke.Color;
+    ACanvas.FillRect(TRectF.Create(
+        FGutterWidth - FGutterRightMargin - 1,
+        0,
+        FGutterWidth - FGutterRightMargin,
+        FGutterControl.Height),
+      0, 0, AllCorners, 1);
 
     // Custom draw gutter
     if Assigned(FOnGutterDraw) then
-      FOnGutterDraw(FGutterControl, Canvas);
+      FOnGutterDraw(FGutterControl, ACanvas);
   finally
-    Canvas.EndScene;
+    ACanvas.EndScene;
   end;
 end;
 
@@ -602,6 +648,14 @@ procedure TRichEditStyled.FillPopupMenu(const AMenu: TPopupMenu);
 begin
   inherited;
   LocalizeDefPopupMenu(AMenu);
+end;
+
+procedure TRichEditStyled.DoGutterAllowMouse(Button: TMouseButton; Shift: TShiftState; X, Y: Single; var Handled: Boolean);
+begin
+  if Assigned(FOnGutterAllowMouse) then
+    FOnGutterAllowMouse(Button, Shift, X, Y, Handled)
+  else
+    Handled := False;
 end;
 
 procedure TRichEditStyled.FreeStyle;
@@ -626,15 +680,20 @@ begin
   var Content: TLayout;
   if FindStyleResource<TLayout>('content', Content) then
   begin
+    FContentMargins := Content.Margins.Rect;
     // Gutter
     FGutterControl := TMemoGutter.Create(Content.Parent);
     Content.Parent.AddObject(FGutterControl);
+    FGutterControl.FMemo := Self;
+    FGutterControl.OnAllowMouse := DoGutterAllowMouse;
+    FGutterControl.ClipChildren := True;
     FGutterControl.Align := TAlignLayout.MostLeft;
     FGutterControl.Width := 0;
+    FGutterControl.Cursor := crArrow;
     FGutterControl.OnPaint := FGutterPaint;
-    FGutterControl.HitTest := False;
-    FGutterControl.Margins.Rect := Content.Margins.Rect;
-    FGutterControl.Margins.Right := -Content.Margins.Left + FGutterRightMargin;
+    FGutterControl.HitTest := True;
+    FGutterControl.Margins.Rect := FContentMargins;
+    FGutterControl.Margins.Right := -FContentMargins.Left;
     RecalcGutter;
   end;
 end;
@@ -657,8 +716,12 @@ begin
   FLineSpacing := 1;
   FGutterRightTextMargin := 4;
   FGutterLeftTextMargin := 10;
-  FGutterRightMargin := 0;
-  FGutterLineColor := TAlphaColors.Null;
+  FGutterRightMargin := 4;
+  FGutterLineColor := TAlphaColors.Dimgray;
+  FColorLineError := TAlphaColorF.Create(1, 0, 0, 0.3).ToAlphaColor;
+  FColorCurrentLine := TAlphaColorF.Create(1, 1, 1, 0.1).ToAlphaColor;
+  FColorLineNumberNormal := TAlphaColorF.Create(1, 1, 1, 0.3).ToAlphaColor;
+  FColorLineNumberActive := TAlphaColorF.Create(1, 1, 1, 1).ToAlphaColor;
   FGutterNumberAllLines := True;
   FLinesBackgroundColor := TObjectDictionary<Integer, TBrush>.Create([doOwnsValues]);
   FWordHighlight := TObjectDictionary<TTextRange, TStrokeBrush>.Create([doOwnsValues]);
@@ -722,7 +785,11 @@ begin
   if FShowGutter then
   begin
     FGutterControl.Canvas.Font.Assign(FGutterFont);
-    var W := Ceil(FGutterControl.Canvas.TextWidth(Memo.Lines.Count.ToString) + FGutterRightTextMargin + FGutterLeftTextMargin);
+    var W := Ceil(
+      FGutterControl.Canvas.TextWidth(Memo.Lines.Count.ToString) +
+      FGutterRightTextMargin +
+      FGutterLeftTextMargin +
+      FGutterRightMargin);
     if FGutterWidth <> W then
       FGutterWidth := W;
   end
@@ -877,6 +944,30 @@ begin
   TRichEditLinesLayout(Editor.LinesLayout).SetCodeSyntaxName(Lang, DefFont, DefColor);
 end;
 
+procedure TRichEditStyled.SetColorCurrentLine(const Value: TAlphaColor);
+begin
+  FColorCurrentLine := Value;
+  Repaint;
+end;
+
+procedure TRichEditStyled.SetColorLineError(const Value: TAlphaColor);
+begin
+  FColorLineError := Value;
+  Repaint;
+end;
+
+procedure TRichEditStyled.SetColorLineNumberActive(const Value: TAlphaColor);
+begin
+  FColorLineNumberActive := Value;
+  Repaint;
+end;
+
+procedure TRichEditStyled.SetColorLineNumberNormal(const Value: TAlphaColor);
+begin
+  FColorLineNumberNormal := Value;
+  Repaint;
+end;
+
 procedure TRichEditStyled.SetErrorLine(const Value: Int64);
 begin
   FErrorLine := Value;
@@ -913,11 +1004,7 @@ end;
 procedure TRichEditStyled.SetGutterRightMargin(const Value: Single);
 begin
   FGutterRightMargin := Value;
-  var Content: TLayout;
-  if Assigned(FGutterControl) and FindStyleResource<TLayout>('content', Content) then
-  begin
-    FGutterControl.Margins.Right := -Content.Margins.Left + FGutterRightMargin;
-  end;
+  RecalcGutter;
   RecalcSize;
   Repaint;
 end;
@@ -951,6 +1038,11 @@ end;
 procedure TRichEditStyled.SetOnDrawBefore(const Value: TPaintEvent);
 begin
   FOnDrawBefore := Value;
+end;
+
+procedure TRichEditStyled.SetOnGutterAllowMouse(const Value: TNotifyAllowMouse);
+begin
+  FOnGutterAllowMouse := Value;
 end;
 
 procedure TRichEditStyled.SetOnGutterDraw(const Value: TPaintEvent);
@@ -1029,6 +1121,44 @@ end;
 destructor TMemoGutter.Destroy;
 begin
   inherited;
+end;
+
+procedure TMemoGutter.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  var Handled := False;
+  if Assigned(FOnAllowMouse) then
+    FOnAllowMouse(Button, Shift, X, Y, Handled);
+  if Handled then
+    inherited
+  else
+    FMemo.MouseDown(Button, Shift, X, Y);
+end;
+
+procedure TMemoGutter.MouseMove(Shift: TShiftState; X, Y: Single);
+begin
+  var Handled := False;
+  if Assigned(FOnAllowMouse) then
+    FOnAllowMouse(TMouseButton.mbLeft, Shift, X, Y, Handled);
+  if Handled then
+    inherited
+  else
+    FMemo.MouseMove(Shift, X, Y);
+end;
+
+procedure TMemoGutter.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  var Handled := False;
+  if Assigned(FOnAllowMouse) then
+    FOnAllowMouse(Button, Shift, X, Y, Handled);
+  if Handled then
+    inherited
+  else
+    FMemo.MouseUp(Button, Shift, X, Y);
+end;
+
+procedure TMemoGutter.SetOnAllowMouse(const Value: TNotifyAllowMouse);
+begin
+  FOnAllowMouse := Value;
 end;
 
 initialization

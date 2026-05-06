@@ -49,6 +49,21 @@ type
     Label4: TLabel;
     SpinBoxGRM: TSpinBox;
     Label5: TLabel;
+    VertScrollBox1: TVertScrollBox;
+    Label6: TLabel;
+    ComboColorBoxGutterLine: TComboColorBox;
+    Label7: TLabel;
+    ComboColorBoxNumberNormal: TComboColorBox;
+    Label8: TLabel;
+    ComboColorBoxNumberActive: TComboColorBox;
+    TabControl1: TTabControl;
+    TabItemFeatures: TTabItem;
+    TabItemColors: TTabItem;
+    VertScrollBox2: TVertScrollBox;
+    Label9: TLabel;
+    ComboColorBoxCurrentLine: TComboColorBox;
+    Label10: TLabel;
+    ComboColorBoxErrorLine: TComboColorBox;
     procedure CheckBoxCurrentLineChange(Sender: TObject);
     procedure CheckBoxErrorLineChange(Sender: TObject);
     procedure CheckBoxGutterChange(Sender: TObject);
@@ -65,6 +80,11 @@ type
     procedure SpinBoxGLTMChangeTracking(Sender: TObject);
     procedure SpinBoxGRTMChangeTracking(Sender: TObject);
     procedure SpinBoxGRMChangeTracking(Sender: TObject);
+    procedure ComboColorBoxGutterLineChange(Sender: TObject);
+    procedure ComboColorBoxNumberNormalChange(Sender: TObject);
+    procedure ComboColorBoxNumberActiveChange(Sender: TObject);
+    procedure ComboColorBoxCurrentLineChange(Sender: TObject);
+    procedure ComboColorBoxErrorLineChange(Sender: TObject);
   private
     procedure FOnMemoDrawAfter(Sender: TObject; ACanvas: TCanvas);
     procedure FOnMemoDrawBefore(Sender: TObject; ACanvas: TCanvas);
@@ -182,15 +202,70 @@ begin
   TRichEditStyled(MemoCSS.Presentation).ShowWordHighLight := CheckBoxWordHighlight.IsChecked;
 end;
 
+procedure TFormMain.ComboColorBoxCurrentLineChange(Sender: TObject);
+begin
+  TRichEditStyled(MemoPascal.Presentation).ColorCurrentLine := ComboColorBoxCurrentLine.Color;
+  TRichEditStyled(MemoJSON.Presentation).ColorCurrentLine := ComboColorBoxCurrentLine.Color;
+  TRichEditStyled(MemoSQL.Presentation).ColorCurrentLine := ComboColorBoxCurrentLine.Color;
+  TRichEditStyled(MemoMD.Presentation).ColorCurrentLine := ComboColorBoxCurrentLine.Color;
+  TRichEditStyled(MemoPython.Presentation).ColorCurrentLine := ComboColorBoxCurrentLine.Color;
+  TRichEditStyled(MemoHTML.Presentation).ColorCurrentLine := ComboColorBoxCurrentLine.Color;
+  TRichEditStyled(MemoCSS.Presentation).ColorCurrentLine := ComboColorBoxCurrentLine.Color;
+end;
+
+procedure TFormMain.ComboColorBoxErrorLineChange(Sender: TObject);
+begin
+  TRichEditStyled(MemoPascal.Presentation).ColorLineError := ComboColorBoxErrorLine.Color;
+  TRichEditStyled(MemoJSON.Presentation).ColorLineError := ComboColorBoxErrorLine.Color;
+  TRichEditStyled(MemoSQL.Presentation).ColorLineError := ComboColorBoxErrorLine.Color;
+  TRichEditStyled(MemoMD.Presentation).ColorLineError := ComboColorBoxErrorLine.Color;
+  TRichEditStyled(MemoPython.Presentation).ColorLineError := ComboColorBoxErrorLine.Color;
+  TRichEditStyled(MemoHTML.Presentation).ColorLineError := ComboColorBoxErrorLine.Color;
+  TRichEditStyled(MemoCSS.Presentation).ColorLineError := ComboColorBoxErrorLine.Color;
+end;
+
+procedure TFormMain.ComboColorBoxGutterLineChange(Sender: TObject);
+begin
+  TRichEditStyled(MemoPascal.Presentation).ColorGutterLine := ComboColorBoxGutterLine.Color;
+  TRichEditStyled(MemoJSON.Presentation).ColorGutterLine := ComboColorBoxGutterLine.Color;
+  TRichEditStyled(MemoSQL.Presentation).ColorGutterLine := ComboColorBoxGutterLine.Color;
+  TRichEditStyled(MemoMD.Presentation).ColorGutterLine := ComboColorBoxGutterLine.Color;
+  TRichEditStyled(MemoPython.Presentation).ColorGutterLine := ComboColorBoxGutterLine.Color;
+  TRichEditStyled(MemoHTML.Presentation).ColorGutterLine := ComboColorBoxGutterLine.Color;
+  TRichEditStyled(MemoCSS.Presentation).ColorGutterLine := ComboColorBoxGutterLine.Color;
+end;
+
+procedure TFormMain.ComboColorBoxNumberActiveChange(Sender: TObject);
+begin
+  TRichEditStyled(MemoPascal.Presentation).ColorLineNumberActive := ComboColorBoxNumberActive.Color;
+  TRichEditStyled(MemoJSON.Presentation).ColorLineNumberActive := ComboColorBoxNumberActive.Color;
+  TRichEditStyled(MemoSQL.Presentation).ColorLineNumberActive := ComboColorBoxNumberActive.Color;
+  TRichEditStyled(MemoMD.Presentation).ColorLineNumberActive := ComboColorBoxNumberActive.Color;
+  TRichEditStyled(MemoPython.Presentation).ColorLineNumberActive := ComboColorBoxNumberActive.Color;
+  TRichEditStyled(MemoHTML.Presentation).ColorLineNumberActive := ComboColorBoxNumberActive.Color;
+  TRichEditStyled(MemoCSS.Presentation).ColorLineNumberActive := ComboColorBoxNumberActive.Color;
+end;
+
+procedure TFormMain.ComboColorBoxNumberNormalChange(Sender: TObject);
+begin
+  TRichEditStyled(MemoPascal.Presentation).ColorLineNumberNormal := ComboColorBoxNumberNormal.Color;
+  TRichEditStyled(MemoJSON.Presentation).ColorLineNumberNormal := ComboColorBoxNumberNormal.Color;
+  TRichEditStyled(MemoSQL.Presentation).ColorLineNumberNormal := ComboColorBoxNumberNormal.Color;
+  TRichEditStyled(MemoMD.Presentation).ColorLineNumberNormal := ComboColorBoxNumberNormal.Color;
+  TRichEditStyled(MemoPython.Presentation).ColorLineNumberNormal := ComboColorBoxNumberNormal.Color;
+  TRichEditStyled(MemoHTML.Presentation).ColorLineNumberNormal := ComboColorBoxNumberNormal.Color;
+  TRichEditStyled(MemoCSS.Presentation).ColorLineNumberNormal := ComboColorBoxNumberNormal.Color;
+end;
+
 procedure TFormMain.ComboColorBoxSelectedTextChange(Sender: TObject);
 begin
-  TRichEditStyled(MemoPascal.Presentation).SelectedTextColor := ComboColorBoxSelectedText.Color;
-  TRichEditStyled(MemoJSON.Presentation).SelectedTextColor := ComboColorBoxSelectedText.Color;
-  TRichEditStyled(MemoSQL.Presentation).SelectedTextColor := ComboColorBoxSelectedText.Color;
-  TRichEditStyled(MemoMD.Presentation).SelectedTextColor := ComboColorBoxSelectedText.Color;
-  TRichEditStyled(MemoPython.Presentation).SelectedTextColor := ComboColorBoxSelectedText.Color;
-  TRichEditStyled(MemoHTML.Presentation).SelectedTextColor := ComboColorBoxSelectedText.Color;
-  TRichEditStyled(MemoCSS.Presentation).SelectedTextColor := ComboColorBoxSelectedText.Color;
+  TRichEditStyled(MemoPascal.Presentation).ColorSelectedText := ComboColorBoxSelectedText.Color;
+  TRichEditStyled(MemoJSON.Presentation).ColorSelectedText := ComboColorBoxSelectedText.Color;
+  TRichEditStyled(MemoSQL.Presentation).ColorSelectedText := ComboColorBoxSelectedText.Color;
+  TRichEditStyled(MemoMD.Presentation).ColorSelectedText := ComboColorBoxSelectedText.Color;
+  TRichEditStyled(MemoPython.Presentation).ColorSelectedText := ComboColorBoxSelectedText.Color;
+  TRichEditStyled(MemoHTML.Presentation).ColorSelectedText := ComboColorBoxSelectedText.Color;
+  TRichEditStyled(MemoCSS.Presentation).ColorSelectedText := ComboColorBoxSelectedText.Color;
 end;
 
 procedure TFormMain.MemoPascalPresentationNameChoosing(Sender: TObject; var PresenterName: string);

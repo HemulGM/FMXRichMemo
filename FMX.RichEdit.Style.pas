@@ -610,7 +610,7 @@ begin
         // Line numbers
         Rect.Width := FGutterWidth - FGutterRightTextMargin - FGutterRightMargin;
 
-        if i = CaretPosition.Line then
+        if (i = CaretPosition.Line) and FShowCurrentLine then
           ACanvas.Fill.Color := FColorLineNumberActive
         else
           ACanvas.Fill.Color := FColorLineNumberNormal;

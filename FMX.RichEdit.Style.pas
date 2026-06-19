@@ -436,10 +436,17 @@ end;
 
 procedure TRichEditLinesLayout.ReplaceLine(const AIndex: Integer; const ALine: string);
 begin
+  if (AIndex >= 0) and (AIndex < Count) and Assigned(Items[AIndex].Layout) then
+    Items[AIndex].Layout.ClearAttributes;
+
   inherited;
-  // We have to reapply style attributes after line modification
-  if (AIndex >= 0) and (AIndex < Count) then // Guard against invalid indices (e.g. when lines are cleared)
+
+  if (AIndex >= 0) and (AIndex < Count) then
+  begin
+    if Assigned(FCodeSyntax) then
+      FCodeSyntax.DropCache(AIndex);
     Items[AIndex].InvalidateLayout;
+  end;
 end;
 
 procedure TRichEditLinesLayout.SetCodeSyntaxName(const Lang: string; const DefFont: TFont; DefColor: TAlphaColor);

@@ -22,7 +22,7 @@ object FormMain: TFormMain
     Size.Height = 724.000000000000000000
     Size.PlatformDefault = False
     TabHeight = 48.000000000000000000
-    TabIndex = 2
+    TabIndex = 3
     TabOrder = 0
     TabPosition = PlatformDefault
     Sizes = (
@@ -474,7 +474,7 @@ object FormMain: TFormMain
       CustomIcon = <
         item
         end>
-      IsSelected = True
+      IsSelected = False
       Size.Width = 46.000000000000000000
       Size.Height = 48.000000000000000000
       Size.PlatformDefault = False
@@ -547,7 +547,7 @@ object FormMain: TFormMain
       CustomIcon = <
         item
         end>
-      IsSelected = False
+      IsSelected = True
       Size.Width = 65.000000000000000000
       Size.Height = 48.000000000000000000
       Size.PlatformDefault = False
@@ -592,6 +592,7 @@ object FormMain: TFormMain
         StyledSettings = [Style, FontColor]
         TextSettings.Font.Family = 'Consolas'
         TextSettings.Font.Size = 14.000000000000000000
+        TextSettings.WordWrap = True
         Align = Client
         Size.Width = 782.000000000000000000
         Size.Height = 676.000000000000000000
@@ -39109,6 +39110,8 @@ object FormMain: TFormMain
         StyleLookup = ''
         TabOrder = 0
         Text = 'Features'
+        ExplicitSize.cx = 73.000000000000000000
+        ExplicitSize.cy = 48.000000000000000000
         object VertScrollBox1: TVertScrollBox
           Align = Client
           Size.Width = 261.000000000000000000
@@ -39374,6 +39377,8 @@ object FormMain: TFormMain
         StyleLookup = ''
         TabOrder = 0
         Text = 'Colors'
+        ExplicitSize.cx = 60.000000000000000000
+        ExplicitSize.cy = 48.000000000000000000
         object VertScrollBox2: TVertScrollBox
           Align = Client
           Size.Width = 261.000000000000000000
@@ -39399,7 +39404,7 @@ object FormMain: TFormMain
               Size.Width = 111.000000000000000000
               Size.Height = 32.000000000000000000
               Size.PlatformDefault = False
-              TabOrder = 160
+              TabOrder = 159
               OnChange = ComboColorBoxGutterLineChange
             end
           end
@@ -39420,7 +39425,7 @@ object FormMain: TFormMain
               Size.Width = 111.000000000000000000
               Size.Height = 32.000000000000000000
               Size.PlatformDefault = False
-              TabOrder = 157
+              TabOrder = 156
               OnChange = ComboColorBoxNumberNormalChange
             end
           end
@@ -39441,7 +39446,7 @@ object FormMain: TFormMain
               Size.Width = 111.000000000000000000
               Size.Height = 32.000000000000000000
               Size.PlatformDefault = False
-              TabOrder = 153
+              TabOrder = 152
               OnChange = ComboColorBoxNumberActiveChange
             end
           end
@@ -39462,7 +39467,7 @@ object FormMain: TFormMain
               Size.Width = 111.000000000000000000
               Size.Height = 32.000000000000000000
               Size.PlatformDefault = False
-              TabOrder = 153
+              TabOrder = 152
               OnChange = ComboColorBoxCurrentLineChange
             end
           end
@@ -39483,7 +39488,7 @@ object FormMain: TFormMain
               Size.Width = 111.000000000000000000
               Size.Height = 32.000000000000000000
               Size.PlatformDefault = False
-              TabOrder = 153
+              TabOrder = 152
               OnChange = ComboColorBoxErrorLineChange
             end
           end

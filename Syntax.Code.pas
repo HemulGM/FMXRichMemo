@@ -54,7 +54,7 @@ type
     constructor Create(DefaultFont: TFont; DefaultColor: TAlphaColor); virtual;
     destructor Destroy; override;
     function GetAttributesForLine(const Line: string; const Index: Integer): TArray<TTextAttributedRangeData>; virtual; abstract;
-    procedure DropCache; virtual;
+    procedure DropCache(LineIndex: Integer = -1); virtual;
     class function FindSyntax(const Language: string; DefaultFont: TFont; DefaultColor: TAlphaColor): TCodeSyntax;
     class procedure RegisterSyntax(Languages: TArray<string>; CodeSyntaxClass: TCodeSyntaxClass);
   end;
@@ -116,9 +116,12 @@ begin
   inherited;
 end;
 
-procedure TCodeSyntax.DropCache;
+procedure TCodeSyntax.DropCache(LineIndex: Integer);
 begin
-  FCached.Clear;
+  if LineIndex <> -1 then
+    FCached.Remove(LineIndex)
+  else
+    FCached.Clear;
 end;
 
 class function TCodeSyntax.FindSyntax(const Language: string; DefaultFont: TFont; DefaultColor: TAlphaColor): TCodeSyntax;

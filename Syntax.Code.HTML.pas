@@ -241,8 +241,12 @@ begin
       AddRange(TagNameStart, J - TagNameStart, FTagKey);
 
       // Attributes
+      var OldJ: Integer := -1;
       while J < ClosePos do
       begin
+        if OldJ = J then
+          Break;
+        OldJ := J;
         while (J < ClosePos) and (IsWS(Line.Chars[J]) or (Line.Chars[J] = '/')) do
           Inc(J);
         if J >= ClosePos then
